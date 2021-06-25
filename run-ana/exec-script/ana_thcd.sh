@@ -8,7 +8,7 @@ readonly FILE_RESULT="${DIR_ROOT:?}/${FILENAME_RESULT:?}"
 
 echo "##### ana => ${FILENAME_EXE:?}"
 echo "##### dir => ${DIR_ROOT:?}"
-mkdir -p "${FILENAME_RESULT:?}"
+mkdir -p "${FILE_RESULT:?}"
 cd "${DIR_ROOT:?}"
 
 "${FILE_EXE:?}"
