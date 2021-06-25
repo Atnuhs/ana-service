@@ -91,15 +91,15 @@ contains
         real(real64),intent(out):: rc,cell
         type(mdda_type):: mdda
         type(rate_type):: rate
-        type(atomic_type):: atomic
-        real(real64):: dens,vol,tmass
+        type(molecular_type):: molecular
+        real(real64):: dens, vol, tmass
 
-        call read_condition(mdda, rate, atomic)
+        call read_condition(mdda, rate, molecular)
 
         ndata = mdda%nstep/mdda%intr
         dens = mdda%dens*rate%nd
         rc = mdda%rc
-        tmass = sum(atomic%mass(:))!*r_mass
+        tmass = sum(molecular%mass(:))!*r_mass
         tmass = tmass/an/1000d0 ! g/mol => g => kg
         vol = np*tmass/dens
         cell = vol**(1d0/3d0)
