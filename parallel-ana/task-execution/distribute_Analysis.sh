@@ -4,10 +4,10 @@
 readonly DIR_SCRIPT_ROOT="$(cd "$(dirname $0)"&&pwd)"
 readonly DIR_SERVICE_ROOT="$(cd "$(dirname $0)/../../"&&pwd)"
 
-readonly DIR_ANALYZE_FOR_EACH_RUN="${DIR_SERVICE_ROOT:?}/analyze-for-each-run"
-readonly DIR_EXE="${DIR_ANALYZE_FOR_EACH_RUN:?}/exe"
-readonly DIR_EXEC_SCRIPT="${DIR_ANALYZE_FOR_EACH_RUN:?}/exec-script"
-readonly FILE_EXE_BUILD="${DIR_ANALYZE_FOR_EACH_RUN:?}/cmake_build.sh"
+readonly DIR_RUN_ANA="${DIR_SERVICE_ROOT:?}/run_ana"
+readonly DIR_EXE="${DIR_RUN_ANA:?}/exe"
+readonly DIR_EXEC_SCRIPT="${DIR_RUN_ANA:?}/exec-script"
+readonly FILE_EXE_BUILD="${DIR_RUN_ANA:?}/cmake_build.sh"
 readonly FILE_ALL_TASK="${DIR_SCRIPT_ROOT:?}/../task-generate/list_analysis.txt"
 
 
