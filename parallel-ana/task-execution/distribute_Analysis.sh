@@ -4,7 +4,7 @@
 readonly DIR_SCRIPT_ROOT="$(cd "$(dirname $0)"&&pwd)"
 readonly DIR_SERVICE_ROOT="$(cd "$(dirname $0)/../../"&&pwd)"
 
-readonly DIR_RUN_ANA="${DIR_SERVICE_ROOT:?}/run_ana"
+readonly DIR_RUN_ANA="${DIR_SERVICE_ROOT:?}/run-ana"
 readonly DIR_EXE="${DIR_RUN_ANA:?}/exe"
 readonly DIR_EXEC_SCRIPT="${DIR_RUN_ANA:?}/exec-script"
 readonly FILE_EXE_BUILD="${DIR_RUN_ANA:?}/cmake_build.sh"
