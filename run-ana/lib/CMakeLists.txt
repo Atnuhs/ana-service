@@ -14,3 +14,4 @@ endmacro(ADDLIB)
 ###　moduleの登録
 ADDLIB(fft)
 ADDLIB(read_condition)
+ADDLIB(representative_value)
