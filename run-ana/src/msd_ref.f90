@@ -3,73 +3,36 @@ program main
     use,intrinsic :: iso_fortran_env
     use fft_mod
     implicit none
-    integer(int32):: i,j,k,run
-    integer(int32):: fst_run, lst_run, num_run
-    integer(int32):: np, ndata, intd, n2
-    ! integer(int32):: omp_get_thread_num
+    integer(int32),parameter:: np = 500
+    integer(int32):: ndata, intd
     real(real64):: dt
-    real(real64), allocatable:: tdr(:,:,:,:), cs_sq(:,:,:,:)
-    real(real64), allocatable:: acf(:,:,:,:)
-    real(real64), allocatable:: msd(:,:,:,:), mean_msd(:,:)
+    real(real64), allocatable:: tdr(:,:,:)
+    real(real64), allocatable:: acf_tdr(:,:,:)
+    real(real64), allocatable:: cs_sq_tdr(:,:,:)
+    real(real64), allocatable:: msd(:,:,:), mean_msd(:)
 
     ! call omp_set_num_threads(4)
-    np = 500
-    fst_run=2
-    lst_run=11
-    num_run=lst_run-fst_run+1
-    call input_condition(ndata, dt, intd)
-
-    allocate(tdr(ndata, 3, np, fst_run:lst_run))
-    
-    ! input ----------------------------------------------
-    print'(a)', '### input'
-    do run=fst_run, lst_run
-        print'(i0)', run
-        tdr(:,:,:,run) = read_dxyz(np, ndata, run)
-    end do
-
-    n2 = 1
-    do while(n2 < ndata)
-        n2=n2*2
-    end do
-
-
-    allocate(acf(0:ndata-1, 3, np, fst_run:lst_run))
-    print'(a)', '### correlation'
+    call input_condition(ndata=ndata, dt=dt, intd=intd)
+    allocate(tdr(ndata, np, 3))
+    allocate(acf_tdr(ndata, np, 3))
+    allocate(cs_sq_tdr(ndata, np, 3))
+    allocate(msd(ndata, np, 3))
+    call read_dxyz(tdr=tdr, ndata=ndata, np=np)
+    call calc_acf(acf_tdr=acf_tdr, tdr=tdr, ndata=ndata, np=np)
+    call calc_cumlutive_sum_square(cs_sq_tdr=cs_sq_tdr, tdr=tdr, nadata=ndata, np=np)
     
 
-    do run=fst_run,lst_run
-        print'(i0)', run
-        !$omp parallel do
-            do i=1,np
-                do j=1,3
-                    call liner_correlation(tdr(:,j,i,run), tdr(:,j,i,run), acf(:,j,i,run),n2)
-                end do
-            end do
-        !$omp end parallel do
-    end do
 
 
     print'(a)', '### cumlutive sum'
-    allocate(cs_sq(0:ndata,3,np,run))
-    cs_sq(0,:,:,:) = 0d0
-    cumlutive_sum :  do run=fst_run,lst_run
-        do i=1,np
-            do j=1,3
-                do k=1,ndata
-                    cs_sq(k,j,i,run) = cs_sq(k-1,j,i,run) + tdr(k,j,i,run)*tdr(k,j,i,run)
-                end do
-            end do
-        end do
-    end do cumlutive_sum
+    
 
-    allocate(msd(0:ndata-1,3,np,run), source=0d0)
     print'(a)', '### calc_msd'
     do run=fst_run,lst_run
         print'(i0)', run
         do i=1,np
             do j=1,3
-                msd(:,j,i,run) = calc_mean_square_displacement(cs_sq(:,j,i,run), acf(:,j,i,run), ndata)
+                msd(:,j,i,run) = calc_mean_square_displacement(cs_sq_tdr(:,j,i,run), acf_tdr(:,j,i,run), ndata)
             end do
         end do
     end do
@@ -95,60 +58,74 @@ program main
     close(12)
     print'(a)', '### end'
 contains
-    function read_dxyz(np,ndata,run) result(run_tdr)
-        integer(int32),intent(in):: np, ndata, run
-        real(real64):: run_tdr(ndata,3,np)
-        character(2):: c_run
-        character(:),allocatable:: dxyz_file_path
-
-        write(c_run,'(i2.2)') run
-        dxyz_file_path = '../run' // c_run // '/dxyz.dat'
-        ! print'(a)', 'read: '//dxyz_file_path
-        open(unit=11, file=dxyz_file_path, status='old')
-        read(11,*)
-            do i=1,ndata
-                read(11,*)
-                do j=1,np
-                    block; real(real64):: x,y,z
-                    read(11,*) x,y,z
-                    run_tdr(i,1,j) = x
-                    run_tdr(i,2,j) = y
-                    run_tdr(i,3,j) = z
-                    end block
-                end do
-            end do
-        close(11)
-    end function
-
-
-    subroutine input_condition(ndata,dt,intd)
-        integer(int32),intent(out):: ndata,intd
+    subroutine input_condition(ndata, dt, intd)
+        integer(int32),intent(out):: ndata, intd
         real(real64),intent(out):: dt
-        integer(int32):: nstep
+        type(mdda_type):: mdda
+        real(real64):: dens, vol, tmass
 
-        open(unit=100,file='../mdda.inpt',status='old')
-            read(100,*) nstep
-            read(100,*)
-            read(100,*)
-            read(100,*) dt
-            read(100,*)
-            read(100,*)
-            read(100,*)
-            read(100,*) intd
-        close(100)
-        ndata=nstep/intd
+        call read_mdda(mdda)
+        ndata = mdda%nstep/mdda%intd
+        dt = mdda%dt
+        intd = mdda%intd
     end subroutine
 
-    function calc_mean_square_displacement(cs_sq, acf, n) result(msd)
-        real(real64),intent(in):: cs_sq(0:n), acf(0:n-1)
+
+    subroutine read_dxyz(tdr, ndata, np)
+        real(real64),intent(out):: tdr(:,:,:)
+        integer(int32),intent(in):: np, ndata
+        integer(int32):: u_dxyz, i, j, k
+        character(100),parameter:: file_dxyz='../dxyz.dat'
+
+        open(newunit=u_dxyz, file=file_dxyz, status='old')
+        read(u_dxyz,*)
+            do i=1,ndata
+                read(u_dxyz,*)
+                read(u_dxyz,*) ((tdr(i,j,k), k=1,3), j=1,np)
+            end do
+        close(u_dxyz)
+    end subroutine
+
+
+    subroutine calc_acf_tdr(acf_tdr, tdr, ndata, np)
+        real(real64),intent(out):: acf_tdr(:,:,:)
+        integer(int32),intent(in):: ndata, np
+        real(real64),intent(in):: tdr(:,:,:)
+        integer(int32):: i,j
+
+        call init_acf(array_size=np)
+        do concurrent(i=1,3, j=1,np)
+            acf_tdr(:,j,i) = auto_correlation_function(tdr(:,j,i))
+        end do
+    end subroutine
+
+
+    subroutine calc_cumlutive_sum_square(cs_sq_tdr, tdr, ndata, np)
+        real(real64),intent(out):: cs_sq_tdr(:,:,:)
+        integer(int32),intent(in):: ndata, np
+        real(real64),intent(in);: tdr(:,:,:)
+
+        cs_sq_tdr(1,:,:) = 0d0
+        do concurrent(i=1,3, j=1,np)
+            do k=2,ndata
+                cs_sq_tdr(k,j,i) = cs_sq_tdr(k-1,j,i) + tdr(k,j,i)*tdr(k,j,i)
+            end do
+        end do
+    end subroutine
+
+
+
+
+    function calc_mean_square_displacement(cs_sq_tdr, acf_tdr, n) result(msd)
+        real(real64),intent(in):: cs_sq_tdr(0:n), acf_tdr(0:n-1)
         integer(int32),intent(in):: n
         real(real64):: msd(0:n-1), cs1, cs2
         integer(int32):: i
 
         do i=0,n-1
-            cs1 = cs_sq(n-i)
-            cs2 = cs_sq(n) - cs_sq(i)
-            msd(i) = cs1+cs2-2*acf(i)
+            cs1 = cs_sq_tdr(n-i)
+            cs2 = cs_sq_tdr(n) - cs_sq_tdr(i)
+            msd(i) = cs1+cs2-2*acf_tdr(i)
         end do
     end function
 end program
