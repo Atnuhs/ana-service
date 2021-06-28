@@ -9,6 +9,6 @@ cd "${DIR_BUILD:?}"
 
 cmake .. \
 -DCMAKE_Fortran_COMPILER="${DIR_FORTRAN_COMPILER:?}" \
--DCMAKE_BUILD_TYPE=release
+-DCMAKE_BUILD_TYPE=debug
 # -DCMAKE_Fortran_COMPILER=/opt/intel/compilers_and_libraries_2016.4.258/linux/bin/intel64/ifort \
 make
