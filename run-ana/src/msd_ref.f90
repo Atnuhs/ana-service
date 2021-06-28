@@ -34,7 +34,6 @@ contains
         integer(int32),intent(out):: ndata, intd
         real(real64),intent(out):: dt
         type(mdda_type):: mdda
-        real(real64):: dens, vol, tmass
 
         call read_mdda(mdda)
         ndata = mdda%nstep/mdda%intd

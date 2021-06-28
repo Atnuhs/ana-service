@@ -25,6 +25,6 @@ while read dir_analysis
 do
     echo "${dir_analysis:?} => $([ -d "${dir_analysis:?}" ] && echo 'T' || echo 'F')"
     mkdir -p "${dir_analysis:?}"/{exe,script}
-    rsync -ah --delete "${DIR_EXE:?}"/ "${dir_analysis:?}/exe"
+    rsync -ah --delete "${DIR_EXE:?}"/*.out "${dir_analysis:?}/exe"
     rsync -ah --delete "${DIR_EXEC_SCRIPT:?}"/ "${dir_analysis:?}/exe-script"
 done < "${FILE_ALL_TASK:?}"
