@@ -1,7 +1,9 @@
 
 program main
     use,intrinsic :: iso_fortran_env
+    use read_condition_mod
     use fft_mod
+    use representative_value_mod
     implicit none
     integer(int32),parameter:: np = 500
     integer(int32):: ndata, intd
@@ -9,54 +11,24 @@ program main
     real(real64), allocatable:: tdr(:,:,:)
     real(real64), allocatable:: acf_tdr(:,:,:)
     real(real64), allocatable:: cs_sq_tdr(:,:,:)
-    real(real64), allocatable:: msd(:,:,:), mean_msd(:)
+    real(real64), allocatable:: msd(:,:,:)
+    real(real64), allocatable:: mean_msd(:), std_msd(:)
 
-    ! call omp_set_num_threads(4)
+    ! インプットの読み込みなどの準備
     call input_condition(ndata=ndata, dt=dt, intd=intd)
     allocate(tdr(ndata, np, 3))
     allocate(acf_tdr(ndata, np, 3))
-    allocate(cs_sq_tdr(ndata, np, 3))
+    allocate(cs_sq_tdr(0:ndata, np, 3))
     allocate(msd(ndata, np, 3))
+    allocate(mean_msd(ndata), std_msd(ndata))
+
+    ! 計算と出力
     call read_dxyz(tdr=tdr, ndata=ndata, np=np)
-    call calc_acf(acf_tdr=acf_tdr, tdr=tdr, ndata=ndata, np=np)
-    call calc_cumlutive_sum_square(cs_sq_tdr=cs_sq_tdr, tdr=tdr, nadata=ndata, np=np)
-    
-
-
-
-    print'(a)', '### cumlutive sum'
-    
-
-    print'(a)', '### calc_msd'
-    do run=fst_run,lst_run
-        print'(i0)', run
-        do i=1,np
-            do j=1,3
-                msd(:,j,i,run) = calc_mean_square_displacement(cs_sq_tdr(:,j,i,run), acf_tdr(:,j,i,run), ndata)
-            end do
-        end do
-    end do
-
-    do i=0,ndata-1
-        msd(i,:,:,:) = msd(i,:,:,:)/dble(ndata-i)
-    end do
-
-    allocate(mean_msd(0:ndata-1,fst_run:lst_run))
-
-    print'(a)', '### calc_average'
-    do run = fst_run, lst_run
-        do i=0,ndata-1
-            mean_msd(i, run) = sum(msd(i,:,:,run))/dble(np)
-        end do
-    end do
-
-    print'(a)', '### output'
-    open(unit=12, file='msd_all.dat', status='replace')
-        do i=0,ndata-1
-            write(12,'(100(e13.5))')dt*dble(i*intd), mean_msd(i,:)
-        enddo
-    close(12)
-    print'(a)', '### end'
+    call calc_acf_tdr(acf_tdr=acf_tdr, tdr=tdr, ndata=ndata, np=np)
+    call calc_cumlutive_sum_square(cs_sq_tdr=cs_sq_tdr, tdr=tdr, ndata=ndata, np=np)
+    call calc_mean_square_displacement(msd=msd, cs_sq_tdr=cs_sq_tdr, acf_tdr=acf_tdr, ndata=ndata, np=np)
+    call calc_mean_msd(mean_msd=mean_msd, std_msd=std_msd, msd=msd, ndata=ndata, np=np)
+    call output_mean_msd(mean_msd=mean_msd, std_msd=std_msd, ndata=ndata, dt=dt, intd=intd)
 contains
     subroutine input_condition(ndata, dt, intd)
         integer(int32),intent(out):: ndata, intd
@@ -72,10 +44,11 @@ contains
 
 
     subroutine read_dxyz(tdr, ndata, np)
+        ! dxyzのデータ読み込み
+        character(100),parameter:: file_dxyz='../dxyz.dat'
         real(real64),intent(out):: tdr(:,:,:)
         integer(int32),intent(in):: np, ndata
         integer(int32):: u_dxyz, i, j, k
-        character(100),parameter:: file_dxyz='../dxyz.dat'
 
         open(newunit=u_dxyz, file=file_dxyz, status='old')
         read(u_dxyz,*)
@@ -88,44 +61,79 @@ contains
 
 
     subroutine calc_acf_tdr(acf_tdr, tdr, ndata, np)
+        ! tdrの自己相関関数を計算O(N log N)
         real(real64),intent(out):: acf_tdr(:,:,:)
         integer(int32),intent(in):: ndata, np
         real(real64),intent(in):: tdr(:,:,:)
         integer(int32):: i,j
 
-        call init_acf(array_size=np)
-        do concurrent(i=1,3, j=1,np)
-            acf_tdr(:,j,i) = auto_correlation_function(tdr(:,j,i))
+        call init_acf(array_size=ndata)
+        do i=1,3
+            do j=1,np
+                acf_tdr(:,j,i) = auto_correlation_function(tdr(:,j,i))
+            end do
         end do
     end subroutine
 
 
     subroutine calc_cumlutive_sum_square(cs_sq_tdr, tdr, ndata, np)
-        real(real64),intent(out):: cs_sq_tdr(:,:,:)
+        ! 「tdrの自乗」の累積和を計算O(N)
+        real(real64),intent(out):: cs_sq_tdr(0:,:,:)
         integer(int32),intent(in):: ndata, np
-        real(real64),intent(in);: tdr(:,:,:)
+        real(real64),intent(in):: tdr(:,:,:)
+        integer(int32):: i,j,k
 
-        cs_sq_tdr(1,:,:) = 0d0
-        do concurrent(i=1,3, j=1,np)
-            do k=2,ndata
+        cs_sq_tdr(0,:,:) = 0d0
+        do concurrent(i=1:3, j=1:np)
+            do k=1,ndata
                 cs_sq_tdr(k,j,i) = cs_sq_tdr(k-1,j,i) + tdr(k,j,i)*tdr(k,j,i)
             end do
         end do
     end subroutine
 
 
+    subroutine calc_mean_square_displacement(msd, cs_sq_tdr, acf_tdr, ndata, np)
+        ! MSDを自己相関関数、累積和を用いて計算O(N)
+        real(real64),intent(out):: msd(:,:,:)
+        real(real64),intent(in):: cs_sq_tdr(0:,:,:), acf_tdr(:,:,:)
+        integer(int32),intent(in):: ndata, np
+        real(real64):: cs1, cs2
+        integer(int32):: i,j,k
 
-
-    function calc_mean_square_displacement(cs_sq_tdr, acf_tdr, n) result(msd)
-        real(real64),intent(in):: cs_sq_tdr(0:n), acf_tdr(0:n-1)
-        integer(int32),intent(in):: n
-        real(real64):: msd(0:n-1), cs1, cs2
-        integer(int32):: i
-
-        do i=0,n-1
-            cs1 = cs_sq_tdr(n-i)
-            cs2 = cs_sq_tdr(n) - cs_sq_tdr(i)
-            msd(i) = cs1+cs2-2*acf_tdr(i)
+        do concurrent(i=1:3, j=1:np, k=0:ndata-1)
+            cs1 = cs_sq_tdr(ndata-k,j,i)
+            cs2 = cs_sq_tdr(ndata,j,i) - cs_sq_tdr(k,j,i)
+            msd(k+1,j,i) = (cs1+cs2-2*acf_tdr(k+1,j,i))/dble(ndata-k)
         end do
-    end function
+    end subroutine
+
+
+    subroutine calc_mean_msd(mean_msd, std_msd, msd, ndata, np)
+        ! 各時間でのmsdの
+        real(real64),intent(out):: mean_msd(:), std_msd(:)
+        integer(int32),intent(in):: ndata, np
+        real(real64),intent(in):: msd(:,:,:)
+        integer(int32):: i,j,k
+        real(real64),allocatable:: tmp_ar(:)
+        real(real64):: std
+
+        allocate(tmp_ar(np*3))
+        do i=1,ndata
+            tmp_ar(:) = [((msd(i,j,k), j=1,np), k=1,3)]
+            mean_msd(i) = mean(arr=tmp_ar, se=std)
+            std_msd(i) = std
+        end do
+    end subroutine
+
+
+    subroutine output_mean_msd(mean_msd, std_msd, ndata, dt, intd)
+        character(100),parameter:: file_mean_msd='msd/mean_msd.dat'
+        integer(int32),intent(in):: ndata, intd
+        real(real64),intent(in):: mean_msd(:), std_msd(:), dt
+        integer(int32):: u_mean_msd, i
+
+        open(newunit=u_mean_msd, file=file_mean_msd, status='replace')
+            write(u_mean_msd,'(3(e13.5))')(dt*dble((i-1)*intd), mean_msd(i), std_msd(i), i=1,ndata)
+        close(u_mean_msd)
+    end subroutine
 end program

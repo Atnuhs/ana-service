@@ -15,4 +15,5 @@ endmacro(ADDEXE)
 
 ### テストディレクトリの追加
 ADDEXE(gr read_condition_mod)
+ADDEXE(msd_ref read_condition_mod fft_mod representative_value_mod)
 
