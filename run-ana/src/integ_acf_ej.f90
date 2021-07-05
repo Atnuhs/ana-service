@@ -28,16 +28,16 @@ contains
         real(real64),parameter:: an=6.0221367d+23
         integer(int32),intent(out):: ndata
         real(real64),intent(out):: dt, vol
-        type(mdda_type):: mdda
+        type(condition_type):: condition
         type(rate_type):: rate
         type(molecular_type):: molecular
         real(real64):: dens, tmass
 
-        call read_condition(mdda, rate, molecular)
+        call read_input(condition, rate, molecular)
 
-        ndata = mdda%nstep
-        dens = mdda%dens*rate%nd
-        dt = mdda%dt
+        ndata = condition%nstep
+        dens = condition%dens*rate%nd
+        dt = condition%dt
         tmass = sum(molecular%mass(:))!*r_mass
         tmass = tmass/an/1000d0 ! g/mol => g => kg
         vol = np*tmass/dens

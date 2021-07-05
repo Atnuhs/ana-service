@@ -3,7 +3,7 @@
 readonly DIR_SCRIPT_ROOT="$(dirname $(readlink -f $0))"
 
 readonly FILE_HOSTS="${DIR_SCRIPT_ROOT:?}/../setting/excution_hosts.tsv"
-readonly FILE_ALL_TASK="${DIR_SCRIPT_ROOT:?}/list_analysis.txt"
+readonly FILE_ALL_TASK="${DIR_SCRIPT_ROOT:?}/task_all.txt"
 readonly TASK_NUM="$(cat "${FILE_ALL_TASK:?}" | wc -l)"
 readonly ALL_CORE="$(awk '{sum+=$2} END{print sum;}' "${FILE_HOSTS:?}")"
 

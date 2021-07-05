@@ -13,10 +13,10 @@ program main
 contains
     subroutine input_condition(ndata)
         integer(int32),intent(out):: ndata
-        type(mdda_type):: mdda
+        type(condition_type):: condition
 
-        call read_mdda(mdda)
-        ndata = mdda%nstep/mdda%inte
+        call read_condition(condition)
+        ndata = condition%nstep/condition%inte
     end subroutine
 
 

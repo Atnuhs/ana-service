@@ -1,7 +1,7 @@
 module read_condition_mod
     use,intrinsic :: iso_fortran_env
     implicit none
-    type mdda_type
+    type condition_type
         integer(int32):: nstep
         integer(int32):: intr, intv, intd, inte
         real(real64):: temp0, dens, dt, rc
@@ -23,20 +23,20 @@ module read_condition_mod
         real(real64):: bond_length
     end type
 contains
-    subroutine read_mdda(mdda)
-        type(mdda_type),intent(out):: mdda
+    subroutine read_condition(condition)
+        type(condition_type),intent(out):: condition
         integer(int32):: u_mdda
 
-        open(newunit=u_mdda,file='../../mdda.inpt',status='old')
-            read(u_mdda,*) mdda%nstep
-            read(u_mdda,*) mdda%temp0
-            read(u_mdda,*) mdda%dens
-            read(u_mdda,*) mdda%dt
-            read(u_mdda,*) mdda%rc
-            read(u_mdda,*) mdda%intr
-            read(u_mdda,*) mdda%intv
-            read(u_mdda,*) mdda%intd
-            read(u_mdda,*) mdda%inte
+        open(newunit=u_mdda,file='../../../input/condition_input.txt',status='old')
+            read(u_mdda,*) condition%nstep
+            read(u_mdda,*) condition%temp0
+            read(u_mdda,*) condition%dens
+            read(u_mdda,*) condition%dt
+            read(u_mdda,*) condition%rc
+            read(u_mdda,*) condition%intr
+            read(u_mdda,*) condition%intv
+            read(u_mdda,*) condition%intd
+            read(u_mdda,*) condition%inte
         close(u_mdda)
     end subroutine
 
@@ -45,13 +45,12 @@ contains
         type(rate_type),intent(out):: rate
         integer(int32):: u_rate
 
-        open(newunit=u_rate, file='../../inpt2.dat', status='old')
+        open(newunit=u_rate, file='../../../input/rate_input.txt', status='old')
             read(u_rate,*) rate%elongation
             read(u_rate,*) rate%bond_length
             read(u_rate,*) rate%moment_of_inertia
             read(u_rate,*) rate%packing_fraction
             read(u_rate,*) rate%temperature
-            read(u_rate,*) 
             read(u_rate,*) rate%eps
             read(u_rate,*) rate%mass
             read(u_rate,*) rate%nd
@@ -63,7 +62,7 @@ contains
         type(molecular_type):: molecular
         integer(int32):: u_molecular
 
-        open(newunit=u_molecular, file='../../molecular.inpt', status='old')
+        open(newunit=u_molecular, file='../../../input/molecular_input.txt', status='old')
             read(u_molecular,*) molecular%mass(:) ! g/mol
             read(u_molecular,*) molecular%sigma(:)       ! m
             read(u_molecular,*) molecular%eps(:)         ! K
@@ -72,12 +71,12 @@ contains
     end subroutine
 
 
-    subroutine read_condition(mdda, rate, molecular)
-        type(mdda_type):: mdda
+    subroutine read_input(condition, rate, molecular)
+        type(condition_type):: condition
         type(rate_type):: rate
         type(molecular_type):: molecular
 
-        call read_mdda(mdda)
+        call read_condition(condition)
         call read_rate(rate)
         call read_molecular(molecular)
     end subroutine

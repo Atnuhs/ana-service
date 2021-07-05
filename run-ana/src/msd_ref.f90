@@ -33,12 +33,12 @@ contains
     subroutine input_condition(ndata, dt, intd)
         integer(int32),intent(out):: ndata, intd
         real(real64),intent(out):: dt
-        type(mdda_type):: mdda
+        type(condition_type):: condition
 
-        call read_mdda(mdda)
-        ndata = mdda%nstep/mdda%intd
-        dt = mdda%dt
-        intd = mdda%intd
+        call read_condition(condition)
+        ndata = condition%nstep/condition%intd
+        dt = condition%dt
+        intd = condition%intd
     end subroutine
 
 
