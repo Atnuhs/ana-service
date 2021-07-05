@@ -2,11 +2,11 @@
 
 
 readonly DIR_ROOT="$(cd "$(dirname $0)/../../.."&&pwd)"
-readonly DIR_ANA_SER="$(cd "$(dirname $0)/.."&&pwd)"
+readonly DIR_ANALYSIS_SERVICE="$(cd "$(dirname $0)/../.."&&pwd)"
 readonly DIR_ANALYSIS_BY_RUN="$(cd "$(dirname $0)/.."&&pwd)"
 
 readonly DIR_PACKAGE="${DIR_ANALYSIS_BY_RUN:?}/package"
-readonly DIR_TASK=""
+readonly DIR_TASK="${DIR_ANALYSIS_SERVECE:?}/task"
 readonly FILE_ALL_TASK="${DIR_ANALYSIS_BY_RUN:?}/../task-generate/task_all.txt"
 
 

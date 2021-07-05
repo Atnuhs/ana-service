@@ -2,9 +2,10 @@
 
 readonly DIR_SCRIPT_ROOT="$(cd "$(dirname $0)"; pwd)"
 readonly DIR_PROJECT_ROOT="$(cd "$(dirname $0)/../../../"; pwd)"
+readonly DIR_TASK="$(cd "$(dirname $0)/../"; pwd)"
 
-readonly FILE_TASK_SETTING="${DIR_SCRIPT_ROOT:?}/../setting/task_name_and_run_num.tsv"
-readonly FILE_RESULT="${DIR_SCRIPT_ROOT:?}/task_all.txt"
+readonly FILE_TASK_SETTING="${DIR_SCRIPT_ROOT:?}/target_projects.tsv"
+readonly FILE_RESULT="${DIR_TASK:?}/task_all.txt"
 readonly DIR_PROJECT_PATHS="${DIR_PROJECT_ROOT:?}/project-paths"
 readonly DIR_CALCULATION="${DIR_PROJECT_ROOT:?}/calculation"
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-readonly DIR_ROOT="$(cd "$(dirname $0)/"&&pwd)"
-readonly FILE_TASK_ALL="${DIR_ROOT:?}/../task-generate/task_all.txt"
+readonly DIR_TASK="$(cd "$(dirname $0)/../../task"&&pwd)"
+readonly FILE_TASK_ALL="${DIR_TASK:?}task_all.txt"
 
 while read task
 do
