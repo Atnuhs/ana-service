@@ -1,8 +1,7 @@
 #!/bin/bash
 
-readonly DIR_SCRIPT_ROOT="$(cd "$(dirname $0)"; pwd)"
 
-readonly DIR_ANALYSIS_SERVICE="$(cd "$(dirname $0)/../.."; pwd)"
+readonly DIR_ANALYSIS_SERVICE="$(cd "$(dirname $0)/../../.."; pwd)"
 readonly FILE_HOSTS="${DIR_ANALYSIS_SERVICE:?}/setting/excution_hosts.tsv"
 
 readonly DIR_TASK="$(cd "$(dirname $0)/../"; pwd)"
