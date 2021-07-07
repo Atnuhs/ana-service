@@ -2,7 +2,7 @@ program main
     use,intrinsic :: iso_fortran_env
     use read_condition_mod
     implicit none
-    integer(int32), parameter:: np=500, gr_len=5000
+    integer(int32), parameter:: np=500, gr_len=10000
     integer(int32):: i, ndata
     real(real64), parameter:: pi=acos(-1d0)
     real(real64):: gr(gr_len)

@@ -2,106 +2,54 @@ program main
     use,intrinsic :: iso_fortran_env
     use read_condition_mod
     implicit none
-    integer(int32), parameter:: np=500, gr_len=5000
-    integer(int32):: i, ndata
-    real(real64), parameter:: pi=acos(-1d0)
-    real(real64):: gr(gr_len)
-    real(real64):: rc, cell, dr
-    real(real64), allocatable:: rxyz(:,:,:)
+    integer(int32),parameter:: gr_len=10000
+    integer(int32):: fst_run, lst_run, run
+    real(real64),allocatable:: x(:), gr_all(:,:), gr_mean(:)
 
-    call input_condition(ndata,rc,cell)
-    dr = rc/dble(gr_len)
-    allocate(rxyz(3,np,ndata))
-    gr(:) = 0d0
-    call read_rxyz(rxyz, ndata, np)
-    call calc_gr(rxyz=rxyz, ndata=ndata, np=np, cell=cell, rc=rc, dr=dr, gr=gr)
-    call normalize_gr(gr,ndata,np,cell,dr)
+    read*, fst_run, lst_run
+    allocate(gr_all(gr_len, fst_run:lst_run))
+    allocate(x(gr_len))
 
-    open(unit=11,file='gr/gr.dat', status='replace')
-        write(11,'(2e14.5)') (i*dr, gr(i), i=1,gr_len)
-    close(11)
+    do run=fst_run, lst_run
+        call read_gr(x, gr_all(:,run), run, gr_len)
+    end do
+
+    call output_gr_all(x, gr, gr_len)
+    call output_gr_mean(x, gr, gr_len)
 contains
-    subroutine read_rxyz(rxyz,ndata,np)
-        real(real64),intent(out):: rxyz(:,:,:)
-        integer(int32),intent(in):: ndata,np
-        integer(int32):: i,j,u_rxyz
+    subroutine read_gr(x, gr, run, gr_len)
+        integer(int32),intent(in):: run, gr_len
+        real(real64),intent(out):: gr(:), x(:)
+        character(100):: file_gr, crun
+        integer(int32):: u_gr, i
 
-        open(newunit=u_rxyz, file='../rxyz.dat', status='old')
-        do i=1,ndata 
-            read(u_rxyz,*)
-            read(u_rxyz,*) (rxyz(:,j,i), j=1,np)
-        end do
+        write(crun,'(I2.2)') run
+        file_gr = '../calculation/run' // trim(crun) // '/Analysis/temp/temp_mean.dat'
+        open(newunit=u_gr, file=file_gr, status='old')
+            read(u_gr, *) (x(i), gr(i), i=1,gr_len)
+        close(u_gr)
+    end subroutine
+
+    subroutine output_gr_all(x, gr, gr_len)
+        character(100),parameter:: file_gr_all = 'gr/gr_all.txt'
+        integer(int32),intent(in):: gr_len
+        real(real64):: x(:), gr(:,:)
+        integer(int32):: u_gr_all
+
+        open(newunit=u_gr_all, file=file_gr_all, status='replace')
+            read(u_gr_all, '(2e20.8)') (x(i), gr(i,:), i=1,gr_all)
+        close(u_gr_all)
     end subroutine
 
 
-    subroutine adjust_periodic(vec, cell, rc)
-        real(real64),intent(in):: cell,rc
-        real(real64),intent(inout):: vec(3)
+    subroutine output_gr_mean(x, gr, gr_len)
+        character(100),parameter:: file_gr_mean = 'gr/gr_mean.txt'
+        integer(int32),intent(in):: gr_len
+        real(real64):: x(:), gr(:,:)
+        integer(int32):: u_gr_mean
 
-        where(vec > rc)
-            vec=vec-cell
-        else where(vec < -rc)
-            vec=vec+cell
-        end where
-    end subroutine
-
-
-    subroutine calc_gr(rxyz, ndata, np,rc, cell, dr, gr)
-        integer(int32),intent(in):: ndata, np
-        real(real64),intent(in):: rc, cell, dr, rxyz(:,:,:)
-        real(real64),intent(inout):: gr(:)
-        real(real64):: r, r2, ri(3), rij(3)
-        integer(int32):: idata,id,i,j
-
-        do idata=1,ndata
-            do i=1,np
-                ri(:) = rxyz(:,i,idata)
-                do j=i+1,np
-                    rij(:) = rxyz(:,j,idata) - ri(:)
-                    call adjust_periodic(rij, cell, rc)
-                    id = ceiling(norm2(rij)/dr)
-                    if (id <= gr_len) gr(id) = gr(id) + 2
-                end do
-            end do
-        end do
-    end subroutine
-
-
-    subroutine normalize_gr(gr,ndata,np,cell,dr)
-        real(real64), parameter:: pi = acos(-1d0) 
-        real(real64), intent(in):: cell, dr
-        real(real64), intent(inout):: gr(:)
-        integer(int32), intent(in)::ndata, np
-        integer(int32):: i
-        real(real64):: v,num_dens,factor
-
-        num_dens = np/(cell*cell*cell)
-        gr(:)=gr(:)/num_dens/dble(np*ndata)
-        factor=4d0/3d0*pi * dr*dr*dr
-        do i=lbound(gr,1), ubound(gr,1)
-            v = factor * dble(3*i*(i-1)+1)
-            gr(i)=gr(i)/v
-        end do
-    end subroutine
-
-
-    subroutine input_condition(ndata,rc,cell)
-        real(real64),parameter:: an=6.0221367d+23
-        integer(int32),intent(out):: ndata
-        real(real64),intent(out):: rc,cell
-        type(condition_type):: condition
-        type(rate_type):: rate
-        type(molecular_type):: molecular
-        real(real64):: dens, vol, tmass
-
-        call read_input(condition, rate, molecular)
-
-        ndata = condition%nstep/condition%intr
-        dens = condition%dens*rate%nd
-        rc = condition%rc
-        tmass = sum(molecular%mass(:))!*r_mass
-        tmass = tmass/an/1000d0 ! g/mol => g => kg
-        vol = np*tmass/dens
-        cell = vol**(1d0/3d0)
+        open(newunit=u_gr_mean, file=file_gr_mean, status='replace')
+            read(u_gr_mean, '(2e20.8)') (x(i), sum(gr(i,:)), i=1,gr_mean)
+        close(u_gr_mean)
     end subroutine
 end program main

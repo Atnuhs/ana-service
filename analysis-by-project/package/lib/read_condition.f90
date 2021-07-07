@@ -27,7 +27,7 @@ contains
         type(condition_type),intent(out):: condition
         integer(int32):: u_mdda
 
-        open(newunit=u_mdda,file='../../../input/condition_input.txt',status='old')
+        open(newunit=u_mdda,file='../input/condition_input.txt',status='old')
             read(u_mdda,*) condition%nstep
             read(u_mdda,*) condition%temp0
             read(u_mdda,*) condition%dens
@@ -45,7 +45,7 @@ contains
         type(rate_type),intent(out):: rate
         integer(int32):: u_rate
 
-        open(newunit=u_rate, file='../../../input/rate_input.txt', status='old')
+        open(newunit=u_rate, file='../input/rate_input.txt', status='old')
             read(u_rate,*) rate%elongation
             read(u_rate,*) rate%bond_length
             read(u_rate,*) rate%moment_of_inertia
@@ -62,7 +62,7 @@ contains
         type(molecular_type):: molecular
         integer(int32):: u_molecular
 
-        open(newunit=u_molecular, file='../../../input/molecular_input.txt', status='old')
+        open(newunit=u_molecular, file='../input/molecular_input.txt', status='old')
             read(u_molecular,*) molecular%mass(:) ! g/mol
             read(u_molecular,*) molecular%sigma(:)       ! m
             read(u_molecular,*) molecular%eps(:)         ! K
