@@ -85,7 +85,6 @@ contains
         real(real64):: thcd, thcd_se
         integer(int32):: u_thcd_mean, i
 
-
         open(newunit=u_thcd_mean, file=file_thcd_mean, status='replace')
             write(u_thcd_mean, *) 'thcd, thcd_se'
             write(u_thcd_mean, *) thcd, thcd_se
