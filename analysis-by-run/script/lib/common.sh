@@ -21,10 +21,18 @@ readonly DIR_PACKAGE="${DIR_ANALYSIS_BY_RUN}/package"
 
 readonly FILE_ALL_TASK="${DIR_TASK}/task_all.txt"
 
+export DIR_TASK FILENAME_EXEC_SCRIPT
+
 parallel_execution() {
-    local LINE="${1}"
-    read host_name num_core < <(echo ${LINE})
-    filename_task="task_${host_name:?}"
+    set -eu
+    local host_name="${1}"
+    local num_core="${2}"
+    file_task="${DIR_TASK}/task_${host_name}.txt"
+    file_exec_script="script/${FILENAME_EXEC_SCRIPT}"
+    ssh "${host_name}" << EOF
+    cat "${file_task}" | \
+        xargs -I{} -P${num_core} bash {}/"${file_exec_script}"
+EOF
 }
 
 export -f parallel_execution
