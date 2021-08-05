@@ -1,0 +1,20 @@
+set -eu -o pipefail
+trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
+
+readonly DIR_SCRIPT="$(cd $(dirname ${0}); pwd)"
+readonly DIR_LIB="${DIR_SCRIPT}/lib"
+
+. "${DIR_LIB}/common.sh"
+
+echo "##### 解析用Fortranのコンパイル" && {
+"${DIR_PACKAGE}/cmake_build.sh"
+"${DIR_PACKAGE}/make_dist.sh"
+}
+
+echo "##### 解析スクリプトの配布 #####"
+while read dir_analysis
+do
+    echo "${dir_analysis} => $([ -d "${dir_analysis}" ] && echo 'T' || echo 'F')"
+    mkdir -p "${dir_analysis}"/{exe,script}
+    rsync -ah "${DIR_PACKAGE}/dist/" "${dir_analysis}"
+done < "${FILE_ALL_TASK}"

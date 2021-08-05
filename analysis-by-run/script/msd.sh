@@ -1,4 +1,6 @@
 #!/bin/bash
+set -eu -o pipefail
+trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
 readonly DIR_ANALYSIS_SERVICE="$(cd "$(dirname $0)/../.." && pwd)"
 readonly DIR_TASK="$(cd "$(dirname $0)/.." && pwd)/task"

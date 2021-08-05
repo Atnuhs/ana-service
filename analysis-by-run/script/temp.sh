@@ -1,11 +1,17 @@
-#!/bin/bash
+set -eu -o pipefail
+trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
-readonly DIR_ANALYSIS_SERVICE="$(cd "$(dirname $0)/../.." && pwd)"
-readonly DIR_TASK="$(cd "$(dirname $0)/.." && pwd)/task"
+readonly DIR_SCRIPT="$(cd $(dirname ${0}); pwd)"
+readonly DIR_LIB="${DIR_SCRIPT}/lib"
+
+. "${DIR_LIB}/common.sh"
+
+
 readonly FILE_HOSTS="${DIR_ANALYSIS_SERVICE:?}/setting/excution_hosts.tsv"
 readonly FILENAME_EXEC_SCRIPT='ana_temp.sh'
 
 echo "##### 解析の実行 #####"
+
 
 
 tail -n +2 "${FILE_HOSTS:?}" | xargs -I{} -P0 bash -c "

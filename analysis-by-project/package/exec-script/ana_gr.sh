@@ -1,20 +1,18 @@
 #!/bin/bash
-
-readonly DIR_ANALYSIS="$(cd "$(dirname "${0}")/.."; pwd)"
-readonly DIR_RATE="$(cd "$(dirname "${0}")/../.."; pwd)"
+set -eu -o pipefail
+trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
 readonly FILENAME_EXE="gr.out"
-readonly DIR_CALCULATION="${DIR_RATE:?}/calculation"
-
-readonly FILE_EXE=""${DIR_ANALYSIS:?}"/bin/${FILENAME_EXE:?}"
 readonly DIRNAME_RESULT="gr"
-readonly DIR_RESULT="${DIR_ANALYSIS:?}/${DIRNAME_RESULT:?}"
-readonly FILE_ANALYSIS_RUN="${DIR_ANALYSIS:?}/analysis_run.txt"
 
+readonly DIR_SCRIPT="$(cd "$(dirname "${0}")"; pwd)"
+readonly DIR_LIB="${DIR_SCRIPT}/lib"
 
-read fst_run lst_run < "${FILE_ANALYSIS_RUN:?}"
-echo "##### dir => ${DIR_ANALYSIS:?}"
-mkdir -p "${DIR_RESULT:?}"
+. "${DIR_LIB}/common.sh"
 
-cd "${DIR_ANALYSIS:?}"
-"${FILE_EXE:?}" <<<"${fst_run:?} ${lst_run:?}"
+read fst_run lst_run < "${FILE_ANALYSIS_RUN}"
+echo "##### dir => ${DIR_ANALYSIS}"
+mkdir -p "${DIR_RESULT}"
+
+cd "${DIR_ANALYSIS}"
+"${FILE_EXE}" <<<"${fst_run} ${lst_run}"

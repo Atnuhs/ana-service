@@ -1,18 +1,17 @@
 #!/bin/bash
+set -eu -o pipefail
+trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
-readonly DIR_ANALYSIS="$(cd "$(dirname "${0}")/.."; pwd)"
-readonly DIR_RATE="$(cd "$(dirname "${0}")/../.."; pwd)"
-
-readonly DIR_CALCULATION="${DIR_RATE:?}/calculation"
-
+readonly FILENAME_EXE=""
 readonly DIRNAME_RESULT="temp"
-readonly DIR_RESULT="${DIR_ANALYSIS:?}/${DIRNAME_RESULT:?}"
+
+readonly DIR_SCRIPT="$(cd "$(dirname "${0}")"; pwd)"
+readonly DIR_LIB="${DIR_SCRIPT}/lib"
+
+. "${DIR_LIB}/common.sh"
+
 readonly FILE_TEMP_MEAN="${DIR_RESULT:?}/temp_mean.txt"
 readonly FILE_TEMP_ALL="${DIR_RESULT:?}/temp_all.txt"
-readonly FILE_STDDEV="${DIR_ANALYSIS:?}/script/stddev.awk"
-
-readonly FILE_ANALYSIS_RUN="${DIR_ANALYSIS:?}/analysis_run.txt"
-
 
 read fst_run lst_run < "${FILE_ANALYSIS_RUN:?}"
 echo "##### dir => ${DIR_ANALYSIS:?}"

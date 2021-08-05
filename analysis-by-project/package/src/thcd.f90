@@ -18,6 +18,7 @@ program main
     allocate(x(ndata))
 
     do run=fst_run, lst_run
+        print*, 'run =>', run
         call read_integ_ej(x, integ_ej_all(:,run), run, ndata)
     end do
     call calc_integ_ej_mean(integ_ej_all, integ_ej_mean, integ_ej_se)

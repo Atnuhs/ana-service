@@ -12,7 +12,7 @@ readonly DIR_CALCULATION="${DIR_NON_TRIAL:?}/calculation"
 
 while read filename_project_struct fst_run lst_run
 do
-    readonly FILE_PROJECT_PATHS="${DIR_PROJECT_PATHS:?}/${filename_project_struct:?}"
+    FILE_PROJECT_PATHS="${DIR_PROJECT_PATHS:?}/${filename_project_struct:?}"
     while read task
     do
         echo -e "${task:?}/Analysis\t${fst_run}\t${lst_run}"  
