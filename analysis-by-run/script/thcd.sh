@@ -8,7 +8,7 @@ readonly FILENAME_EXEC_SCRIPT='ana_thcd.sh'
 
 . "${DIR_LIB}/common.sh"
 
-echo "##### 解析の実行 #####" | : {
+echo "##### 解析の実行 #####" : {
     tail -n +2 "${FILE_HOSTS:?}" | \
-        xargs -I{} -P0 bash -c "parallel_execution {}"
+        xargs -I{} -P0 -t bash -c "parallel_execution {}" \
 }

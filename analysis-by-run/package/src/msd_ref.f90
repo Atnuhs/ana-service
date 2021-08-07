@@ -2,31 +2,25 @@
 program main
     use,intrinsic :: iso_fortran_env
     use read_condition_mod
-    use fft_mod
     use representative_value_mod
+    use mean_square_displacement_mod
     implicit none
     integer(int32),parameter:: np = 500
     integer(int32):: ndata, intd
     real(real64):: dt
     real(real64), allocatable:: tdr(:,:,:)
-    real(real64), allocatable:: acf_tdr(:,:,:)
-    real(real64), allocatable:: cs_sq_tdr(:,:,:)
     real(real64), allocatable:: msd(:,:,:)
     real(real64), allocatable:: mean_msd(:), std_msd(:)
 
     ! インプットの読み込みなどの準備
     call input_condition(ndata=ndata, dt=dt, intd=intd)
     allocate(tdr(ndata, np, 3))
-    allocate(acf_tdr(ndata, np, 3))
-    allocate(cs_sq_tdr(0:ndata, np, 3))
     allocate(msd(ndata, np, 3))
     allocate(mean_msd(ndata), std_msd(ndata))
-
+    call init_msd(ndata)
     ! 計算と出力
     call read_dxyz(tdr=tdr, ndata=ndata, np=np)
-    call calc_acf_tdr(acf_tdr=acf_tdr, tdr=tdr, ndata=ndata, np=np)
-    call calc_cumlutive_sum_square(cs_sq_tdr=cs_sq_tdr, tdr=tdr, ndata=ndata, np=np)
-    call calc_mean_square_displacement(msd=msd, cs_sq_tdr=cs_sq_tdr, acf_tdr=acf_tdr, ndata=ndata, np=np)
+    call calc_msd(msd=msd, tdr=tdr, ndata=ndata, np=np)
     call calc_mean_msd(mean_msd=mean_msd, std_msd=std_msd, msd=msd, ndata=ndata, np=np)
     call output_mean_msd(mean_msd=mean_msd, std_msd=std_msd, ndata=ndata, dt=dt, intd=intd)
 contains
@@ -59,50 +53,17 @@ contains
     end subroutine
 
 
-    subroutine calc_acf_tdr(acf_tdr, tdr, ndata, np)
-        ! tdrの自己相関関数を計算O(N log N)
-        real(real64),intent(out):: acf_tdr(:,:,:)
-        integer(int32),intent(in):: ndata, np
-        real(real64),intent(in):: tdr(:,:,:)
-        integer(int32):: i,j
-
-        call init_acf(array_size=ndata)
-        do i=1,3
-            do j=1,np
-                acf_tdr(:,j,i) = auto_correlation_function(tdr(:,j,i))
-            end do
-        end do
-    end subroutine
-
-
-    subroutine calc_cumlutive_sum_square(cs_sq_tdr, tdr, ndata, np)
-        ! 「tdrの自乗」の累積和を計算O(N)
-        real(real64),intent(out):: cs_sq_tdr(0:,:,:)
-        integer(int32),intent(in):: ndata, np
-        real(real64),intent(in):: tdr(:,:,:)
-        integer(int32):: i,j,k
-
-        cs_sq_tdr(0,:,:) = 0d0
-        do concurrent(i=1:3, j=1:np)
-            do k=1,ndata
-                cs_sq_tdr(k,j,i) = cs_sq_tdr(k-1,j,i) + tdr(k,j,i)*tdr(k,j,i)
-            end do
-        end do
-    end subroutine
-
-
-    subroutine calc_mean_square_displacement(msd, cs_sq_tdr, acf_tdr, ndata, np)
+    subroutine calc_msd(msd, tdr, ndata, np)
         ! MSDを自己相関関数、累積和を用いて計算O(N)
         real(real64),intent(out):: msd(:,:,:)
-        real(real64),intent(in):: cs_sq_tdr(0:,:,:), acf_tdr(:,:,:)
+        real(real64),intent(in):: tdr(:,:,:)
         integer(int32),intent(in):: ndata, np
-        real(real64):: cs1, cs2
-        integer(int32):: i,j,k
+        integer(int32):: i,j
 
-        do concurrent(i=1:3, j=1:np, k=0:ndata-1)
-            cs1 = cs_sq_tdr(ndata-k,j,i)
-            cs2 = cs_sq_tdr(ndata,j,i) - cs_sq_tdr(k,j,i)
-            msd(k+1,j,i) = (cs1+cs2-2*acf_tdr(k+1,j,i))/dble(ndata-k)
+        do i=1,3
+            do j=1,np
+                call calc_mean_square_displacement(msd(:,j,i), tdr(:,j,i), ndata)
+            end do
         end do
     end subroutine
 

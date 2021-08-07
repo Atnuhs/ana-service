@@ -31,7 +31,7 @@ parallel_execution() {
     file_exec_script="script/${FILENAME_EXEC_SCRIPT}"
     ssh "${host_name}" << EOF
     cat "${file_task}" | \
-        xargs -I{} -P${num_core} bash {}/"${file_exec_script}"
+        xargs -I{} -P${num_core} -t bash {}/"${file_exec_script}"
 EOF
 }
 
