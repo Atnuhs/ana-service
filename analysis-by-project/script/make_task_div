@@ -1,11 +1,11 @@
 #!/bin/bash
+set -eu -o pipefail
+trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
+readonly DIR_SCRIPT="$(cd $(dirname ${0}); pwd)"
+readonly DIR_LIB="${DIR_SCRIPT}/lib"
 
-readonly DIR_ANALYSIS_SERVICE="$(cd "$(dirname $0)/../../.."; pwd)"
-readonly FILE_HOSTS="${DIR_ANALYSIS_SERVICE:?}/setting/excution_hosts.tsv"
-
-readonly DIR_TASK="$(cd "$(dirname $0)/../"; pwd)"
-readonly FILE_ALL_TASK="${DIR_TASK:?}/task_all.tsv"
+. "${DIR_LIB}/common.sh"
 
 readonly TASK_NUM="$(cat "${FILE_ALL_TASK:?}" | wc -l)"
 readonly ALL_CORE="$(awk '{sum+=$2} END{print sum;}' "${FILE_HOSTS:?}")"
