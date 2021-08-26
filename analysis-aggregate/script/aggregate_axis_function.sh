@@ -6,7 +6,7 @@ readonly DIR_SCRIPT="$(cd $(dirname ${0}); pwd)"
 readonly DIR_LIB="${DIR_SCRIPT}/lib"
 
 . "${DIR_LIB}/common.sh"
-readonly FILE_RESULT="${DIR_AGGREGATE}/aggregate_axis_function.tsv"
+readonly FILE_RESULT="${DIR_OUTPUT}/aggregate_axis_function.tsv"
 
 
 while read filename_project_struct fst_run lst_run 
@@ -18,7 +18,7 @@ do
         # get output_param.dat at run01
         dir_run01="${task}/calculation/run01"
         file_param="${dir_run01}/output_param.dat"
-        echo "${task}\t$(paste -s $file_param)"
+        echo -e "${task}\t$(paste -s $file_param)"
 
     done < "${file_project_paths}"
 done < <(tail -n +2 "${FILE_TASK_SETTING}") | tee "${FILE_RESULT}"

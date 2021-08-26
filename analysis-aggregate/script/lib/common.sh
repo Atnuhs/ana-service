@@ -13,5 +13,7 @@ readonly DIR_CALCULATION="${DIR_ROOT}/calculation"
 readonly DIR_MD_SERVICE_OUTPUT="${DIR_MD_SERVICE}/output"
 readonly DIR_PROJECT_PATHS="${DIR_MD_SERVICE_OUTPUT}/project-paths"
 
+readonly DIR_OUTPUT="${DIR_AGGREGATE}/output"
+
 readonly FILE_TASK_SETTING="${DIR_ANALYSIS_SERVICE}/setting/target_projects.tsv"
 readonly FILE_HOSTS="${DIR_ANALYSIS_SERVICE}/setting/excution_hosts.tsv"

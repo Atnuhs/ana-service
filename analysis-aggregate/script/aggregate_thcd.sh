@@ -6,7 +6,7 @@ readonly DIR_SCRIPT="$(cd $(dirname ${0}); pwd)"
 readonly DIR_LIB="${DIR_SCRIPT}/lib"
 
 . "${DIR_LIB}/common.sh"
-readonly FILE_RESULT="${DIR_AGGREGATE}/aggregate_thcd.tsv"
+readonly FILE_RESULT="${DIR_OUTPUT}/aggregate_thcd.tsv"
 
 
 while read filename_project_struct fst_run lst_run
