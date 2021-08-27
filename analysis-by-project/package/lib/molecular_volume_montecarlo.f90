@@ -21,7 +21,7 @@ contains
 
         print'(a)', 'calc montecarlo --------------------------------'
         cnt=0
-        interval = m/10
+        interval = m/1000
         do i=1,m
             p_rand(:) = [(randrange(pos_maxmin(2,j), pos_maxmin(1,j)), j=1,3)]
             inside=.false.
@@ -30,7 +30,7 @@ contains
                 inside = inside .or. dist <= radius(j)
             end do
             if (inside) cnt=cnt+1
-            if (mod(i,interval)==0) print*, i ,'/', m, dble(cnt)/dble(i)
+            if (mod(i,interval)==0) print*, i , dble(cnt)/dble(i)
         end do
         ret = dble(cnt)/dble(m) * box_vol
     end function
@@ -49,3 +49,20 @@ contains
         end do
     end function
 end module molecular_volume_montecarlo_mod
+
+
+program main
+    use,intrinsic :: iso_fortran_env
+    use molecular_volume_montecarlo_mod
+    implicit none
+    integer(int32),parameter:: n=2,m=100000000
+    real(real64):: radius(n), pos(3,n)
+    
+    radius(1) = 2d0
+    radius(2) = 2d0
+    pos(:,1) = [-1.5d0, 0d0, 0d0]
+    pos(:,2) = [ 1.5d0, 0d0, 0d0]
+
+    print*, calc_molecular_volume(n,m, radius, pos)
+    
+end program main
