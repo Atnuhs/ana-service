@@ -9,11 +9,12 @@ contains
         ! output:: m, (v, sd, se) <- optional
         real(prec),intent(in):: arr(:)
         real(prec),optional,intent(out):: v, sd, se
-        real(prec):: m, len_arr, cv, csd
+        real(prec):: m, m2, len_arr, cv, csd
 
         len_arr = dble(size(arr))
         m = sum(arr)/len_arr
-        cv = sum((arr-m)*(arr-m))/len_arr
+        m2 = sum(arr*arr)/len_arr
+        cv = m2 - m*m
         csd = sqrt(cv)
         if (present(v)) v = cv
         if (present(sd)) sd = csd

@@ -19,3 +19,4 @@ cd "${DIR_ANALYSIS:?}"
 "${FILE_EXE:?}" <<<"${fst_run:?} ${lst_run:?}"
 
 cat "${DIR_RESULT}/integ_ej_mean.txt" | split_file '100' > "${DIR_RESULT}/integ_ej_mean_sp.txt" 
+cat "${DIR_RESULT}/integ_ej_all.txt" | split_file '100' > "${DIR_RESULT}/integ_ej_all_sp.txt" 
