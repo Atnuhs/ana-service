@@ -17,4 +17,5 @@ endmacro(ADDEXE)
 ADDEXE(gr read_condition_mod representative_value_mod)
 ADDEXE(msd read_condition_mod representative_value_mod)
 ADDEXE(thcd read_condition_mod representative_value_mod)
+ADDEXE(viscousity read_condition_mod representative_value_mod)
 

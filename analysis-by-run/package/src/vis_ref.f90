@@ -163,7 +163,7 @@ contains
         integer(int32):: u_viscousity
 
         open(newunit=u_viscousity, file=file_viscousity, status='replace')
-            write(u_viscousity,'(3e20.10)') viscousity(:)
+            write(u_viscousity,'(e20.10)') sum(viscousity(:)) / 3d0
         close(u_viscousity)
     end subroutine
 end program
