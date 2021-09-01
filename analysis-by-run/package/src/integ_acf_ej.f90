@@ -7,8 +7,8 @@ program main
     real(real64),allocatable:: ej(:,:)
     real(real64),allocatable:: acf_ej(:,:)
     real(real64),allocatable:: integ_acf_ej(:,:)
-    integer(int32):: ndata
-    real(real64):: temp, dt, vol
+    integer(int32):: ndata, fst_calc=1000, lst_calc=2000
+    real(real64):: temp, dt, vol, thcd
 
 
     ! データの読み込み
@@ -21,8 +21,10 @@ program main
     call read_tdc(ej=ej, ndata=ndata)
     call calc_acf_ej(acf_ej=acf_ej, ej=ej, ndata=ndata, vol=vol, temp=temp)
     call calc_integ_acf_ej(integ_acf_ej=integ_acf_ej, acf_ej=acf_ej, ndata=ndata, dt=dt)
+    call calc_thcd(integ_acf_ej=integ_acf_ej, thcd=thcd)
     call output_acf_ej(acf_ej=acf_ej, ndata=ndata, dt=dt)
     call output_integ_acf_ej(integ_acf_ej=integ_acf_ej, ndata=ndata, dt=dt)
+    call output_thcd(thcd=thcd)
 contains
     subroutine input_condition(ndata,dt,vol)
         real(real64),parameter:: an=6.0221367d+23
@@ -95,6 +97,14 @@ contains
     end subroutine
 
 
+    subroutine calc_thcd(integ_acf_ej, thcd)
+        real(real64),intent(in):: integ_acf_ej(:,:)
+        real(real64),intent(out):: thcd
+
+        thcd = sum(integ_acf_ej(fst_calc:lst_calc, :)) / dble(lst_calc-fst_calc+1) / 3d0
+    end subroutine
+
+
     pure function trapezoidal_integration(f,dx,n) result(g)
         real(real64),intent(in):: f(:), dx
         integer(int32),intent(in):: n
@@ -132,5 +142,16 @@ contains
         open(newunit=u_integ_acf_ej, file=file_integ_acf_ej, status='replace')
             write(u_integ_acf_ej,'(2e20.10)') (dt*dble(i-1), sum(integ_acf_ej(i,:))*inv3, i=1,ndata)
         close(u_integ_acf_ej)
+    end subroutine
+
+
+    subroutine output_thcd(thcd)
+        character(100),parameter:: file_thcd = 'thcd/thcd.dat'
+        real(real64),intent(in):: thcd
+        integer(int32):: u_thcd
+
+        open(newunit=u_thcd, file=file_thcd, status='replace')
+            write(u_thcd,'(e20.10)') thcd
+        close(u_thcd)
     end subroutine
 end program

@@ -7,30 +7,32 @@ program main
     integer(int32):: fst_run, lst_run, run
     integer(int32):: fst_calc, lst_calc
     real(real64),allocatable:: x(:), integ_ej_all(:,:), integ_ej_mean(:), integ_ej_se(:)
+    real(real64),allocatable:: thcd_run(:)
     real(real64):: thcd, thcd_sd
 
     read*, fst_run, lst_run
-    fst_calc = 1000
-    lst_calc = 2000
     call input_condition(ndata)
     allocate(integ_ej_all(ndata, fst_run:lst_run))
     allocate(integ_ej_mean(ndata), integ_ej_se(ndata))
     allocate(x(ndata))
+    allocate(thcd_run(fst_run:lst_run))
+
 
     do run=fst_run, lst_run
-        print*, 'run =>', run
+        print*, 'read run =>', run
         call read_integ_ej(x, integ_ej_all(:,run), run, ndata)
+        call read_thcd_run(thcd_run(run))
     end do
-    print*, 'calc_mean'
+
+    print*, 'calc'
     call calc_integ_ej_mean(integ_ej_all, integ_ej_mean, integ_ej_se)
-    print*, 'output_thcd'
-    call calc_thcd(integ_ej_mean, thcd, thcd_sd, fst_calc, lst_calc)
-    print*, 'output_mean'
+    call calc_thcd(thcd_run, thcd, thcd_sd, fst_run, lst_run)
+
+    print*, 'output'
     call output_integ_ej_mean(x, integ_ej_mean, integ_ej_se, ndata)
-    print*, 'output_all'
     call output_integ_ej_all(x, integ_ej_all, ndata)
-    print*, 'output_result'
     call output_thcd(thcd, thcd_sd)
+
     print*, 'end'
 contains
     subroutine input_condition(ndata)
@@ -56,6 +58,19 @@ contains
     end subroutine
 
 
+    subroutine read_thcd_run(thcd)
+        real(real64),intent(out):: thcd
+        character(100):: file_thcd, crun
+        integer(int32):: u_thcd, i
+
+        write(crun,'(I2.2)') run
+        file_thcd = '../calculation/run' // trim(crun) // '/Analysis/thcd/thcd.dat'
+        open(newunit=u_thcd, file=file_thcd, status='old')
+            read(u_thcd, *) thcd
+        close(u_thcd)
+    end subroutine
+
+
     subroutine calc_integ_ej_mean(integ_ej_all, integ_ej_mean, integ_ej_se)
         real(real64), intent(out):: integ_ej_mean(:), integ_ej_se(:)
         real(real64), intent(in):: integ_ej_all(:,:)
@@ -67,12 +82,12 @@ contains
     end subroutine
 
 
-    subroutine calc_thcd(integ_ej_mean, thcd, thcd_sd, fst_calc, lst_calc)
+    subroutine calc_thcd(thcd_run, thcd, thcd_sd, fst_run, lst_run)
         real(real64),intent(out):: thcd, thcd_sd
-        real(real64),intent(in):: integ_ej_mean(:)
-        integer(int32):: fst_calc, lst_calc
+        integer(int32),intent(in):: fst_run, lst_run
+        real(real64),intent(in):: thcd_run(fst_run:lst_run)
         
-        thcd = mean(integ_ej_mean(fst_calc:lst_calc), sd=thcd_sd)
+        thcd = mean(thcd_run(fst_run:lst_run), sd=thcd_sd)
     end subroutine
 
 
