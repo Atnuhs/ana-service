@@ -1,6 +1,6 @@
 program main
     use,intrinsic :: iso_fortran_env
-    use read_condition_mod
+    use md_condition_for_ana_mod
     implicit none
     integer(int32), parameter:: np=500, gr_len=10000
     integer(int32):: i, ndata
@@ -9,7 +9,7 @@ program main
     real(real64):: rc, cell, dr
     real(real64), allocatable:: rxyz(:,:,:)
 
-    call input_condition(ndata,rc,cell)
+    call load_condition_for_gr_ana(ndata=ndata, rc=rc, cell=cell)
     dr = rc/dble(gr_len)
     allocate(rxyz(3,np,ndata))
     gr(:) = 0d0
@@ -27,7 +27,8 @@ contains
         integer(int32):: i,j,u_rxyz
 
         open(newunit=u_rxyz, file='../rxyz.dat', status='old')
-        do i=1,ndata 
+        do i=1,ndata
+            if (mod(i,100) == 0) print*, 'read:', i, '/', ndata
             read(u_rxyz,*)
             read(u_rxyz,*) (rxyz(:,j,i), j=1,np)
         end do
@@ -54,6 +55,7 @@ contains
         integer(int32):: idata,id,i,j
 
         do idata=1,ndata
+            if (mod(idata,100) == 0) print*, 'calc:', idata, '/', ndata
             do i=1,np
                 ri(:) = rxyz(:,i,idata)
                 do j=i+1,np
@@ -77,31 +79,12 @@ contains
 
         num_dens = np/(cell*cell*cell)
         gr(:)=gr(:)/num_dens/dble(np*ndata)
+
         factor=4d0/3d0*pi * dr*dr*dr
+        
         do i=lbound(gr,1), ubound(gr,1)
             v = factor * dble(3*i*(i-1)+1)
             gr(i)=gr(i)/v
         end do
-    end subroutine
-
-
-    subroutine input_condition(ndata,rc,cell)
-        real(real64),parameter:: an=6.0221367d+23
-        integer(int32),intent(out):: ndata
-        real(real64),intent(out):: rc,cell
-        type(condition_type):: condition
-        type(rate_type):: rate
-        type(molecular_type):: molecular
-        real(real64):: dens, vol, tmass
-
-        call read_input(condition, rate, molecular)
-
-        ndata = condition%nstep/condition%intr
-        dens = condition%dens*rate%nd
-        rc = condition%rc
-        tmass = sum(molecular%mass(:))!*r_mass
-        tmass = tmass/an/1000d0 ! g/mol => g => kg
-        vol = np*tmass/dens
-        cell = vol**(1d0/3d0)
     end subroutine
 end program main

@@ -10,7 +10,6 @@ contains
     end subroutine
 
 
-
     subroutine calc_cumlutive_sum_square(cs_sq, src, n)
         ! 「自乗」の累積和を計算O(N)
         integer(int32),intent(in):: n

@@ -1,25 +1,16 @@
 program main
     use,intrinsic :: iso_fortran_env
-    use read_condition_mod
+    use md_condition_for_ana_mod
     use representative_value_mod
     implicit none
     integer(int32):: ndata,i
     real(real64),allocatable:: temp(:)
 
-    call input_condition(ndata=ndata)
+    call load_condition_for_temp_ana(ndata=ndata)
     allocate(temp(ndata))
     call read_enrg(temp=temp, ndata=ndata)
     call output_temp_mean(temp=temp, ndata=ndata)
 contains
-    subroutine input_condition(ndata)
-        integer(int32),intent(out):: ndata
-        type(condition_type):: condition
-
-        call read_condition(condition)
-        ndata = condition%nstep/condition%inte
-    end subroutine
-
-
     subroutine read_enrg(temp,ndata)
         character(100),parameter:: file_enrg='../enrg.dat'
         integer(int32),intent(in):: ndata
