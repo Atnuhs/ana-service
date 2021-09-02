@@ -1,7 +1,8 @@
 program main
     use, intrinsic:: iso_fortran_env
     use fft_mod
-    use read_condition_mod
+    use md_condition_for_ana_mod
+    use numerical_integration_mod
     implicit none
     integer(int32),parameter:: np=500
     real(real64),allocatable:: ej(:,:)
@@ -12,40 +13,23 @@ program main
 
 
     ! データの読み込み
-    call input_condition(ndata=ndata, dt=dt, vol=vol)
-    call read_temp_mean(temp)
+    call load_condition_for_thcd_ana(ndata=ndata, dt=dt, vol=vol)
     allocate(ej(ndata, 3))
     allocate(acf_ej(ndata, 3))
     allocate(integ_acf_ej(ndata, 3))
-
+    call read_temp_mean(temp)
     call read_tdc(ej=ej, ndata=ndata)
+
+    ! 計算
     call calc_acf_ej(acf_ej=acf_ej, ej=ej, ndata=ndata, vol=vol, temp=temp)
     call calc_integ_acf_ej(integ_acf_ej=integ_acf_ej, acf_ej=acf_ej, ndata=ndata, dt=dt)
     call calc_thcd(integ_acf_ej=integ_acf_ej, thcd=thcd)
+
+    ! 出力
     call output_acf_ej(acf_ej=acf_ej, ndata=ndata, dt=dt)
     call output_integ_acf_ej(integ_acf_ej=integ_acf_ej, ndata=ndata, dt=dt)
     call output_thcd(thcd=thcd)
 contains
-    subroutine input_condition(ndata,dt,vol)
-        real(real64),parameter:: an=6.0221367d+23
-        integer(int32),intent(out):: ndata
-        real(real64),intent(out):: dt, vol
-        type(condition_type):: condition
-        type(rate_type):: rate
-        type(molecular_type):: molecular
-        real(real64):: dens, tmass
-
-        call read_input(condition, rate, molecular)
-
-        ndata = condition%nstep
-        dens = condition%dens*rate%nd
-        dt = condition%dt
-        tmass = sum(molecular%mass(:))!*r_mass
-        tmass = tmass/an/1000d0 ! g/mol => g => kg
-        vol = np*tmass/dens
-    end subroutine
-
-
     subroutine read_temp_mean(temp)
         character(100),parameter:: file_temp_mean='temp/temp_mean.dat'
         real(real64):: temp
@@ -81,7 +65,6 @@ contains
             acf_ej(:,i) = auto_correlation_function(ej(:,i))
         end do
         acf_ej(:,:) = acf_ej(:,:)/(dble(ndata) * vol*kbt*temp*temp)
-
     end subroutine
 
 
@@ -103,20 +86,6 @@ contains
 
         thcd = sum(integ_acf_ej(fst_calc:lst_calc, :)) / dble(lst_calc-fst_calc+1) / 3d0
     end subroutine
-
-
-    pure function trapezoidal_integration(f,dx,n) result(g)
-        real(real64),intent(in):: f(:), dx
-        integer(int32),intent(in):: n
-        real(real64):: g(n)
-        integer(int32):: i
-
-        g(1)=0d0
-        do i=2,n
-            g(i) = g(i-1) + f(i-1) + f(i)
-        end do 
-        g(:)=g(:)*5d-1*dx
-    end function
 
 
     subroutine output_acf_ej(acf_ej, ndata, dt)

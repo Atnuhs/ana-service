@@ -1,7 +1,7 @@
 
 program main
     use,intrinsic :: iso_fortran_env
-    use read_condition_mod
+    use md_condition_for_ana_mod
     use representative_value_mod
     use mean_square_displacement_mod
     implicit none
@@ -13,29 +13,20 @@ program main
     real(real64), allocatable:: mean_msd(:), std_msd(:)
 
     ! インプットの読み込みなどの準備
-    call input_condition(ndata=ndata, dt=dt, intd=intd)
+    call load_condition_for_msd_ana(ndata, dt, intd)
     allocate(tdr(ndata, np, 3))
     allocate(msd(ndata, np, 3))
     allocate(mean_msd(ndata), std_msd(ndata))
     call init_msd(ndata)
-    ! 計算と出力
+    
+    ! 計算
     call read_dxyz(tdr=tdr, ndata=ndata, np=np)
     call calc_msd(msd=msd, tdr=tdr, ndata=ndata, np=np)
     call calc_mean_msd(mean_msd=mean_msd, std_msd=std_msd, msd=msd, ndata=ndata, np=np)
+
+    ! 出力
     call output_mean_msd(mean_msd=mean_msd, std_msd=std_msd, ndata=ndata, dt=dt, intd=intd)
 contains
-    subroutine input_condition(ndata, dt, intd)
-        integer(int32),intent(out):: ndata, intd
-        real(real64),intent(out):: dt
-        type(condition_type):: condition
-
-        call read_condition(condition)
-        ndata = condition%nstep/condition%intd
-        dt = condition%dt
-        intd = condition%intd
-    end subroutine
-
-
     subroutine read_dxyz(tdr, ndata, np)
         ! dxyzのデータ読み込み
         character(100),parameter:: file_dxyz='../dxyz.dat'

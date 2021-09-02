@@ -1,7 +1,8 @@
 program main
     use,intrinsic :: iso_fortran_env
+    use md_condition_for_ana_mod
+    use numerical_integration_mod
     use fft_mod
-    use read_condition_mod
     implicit none
     integer(int32),parameter:: np=500
     integer(int32):: fst_calc, lst_calc, all_calc, ndata
@@ -13,47 +14,25 @@ program main
     fst_calc = 1000
     lst_calc = 1500
     all_calc = lst_calc-fst_calc+1
-    call input_condition(ndata=ndata, dt=dt, vol=vol)
+    call load_condition_for_viscousity_ana(ndata=ndata, dt=dt, vol=vol)
     call read_temp_mean(temp)
     allocate(stress(ndata,3))
     allocate(acf_stress(ndata,3))
     allocate(integ_acf_stress(ndata,3))
 
-    ! reading
+    ! 読み込み
     call read_stress(stress, ndata)
     
-    ! calc
+    ! 計算
     call calc_acf_stress(acf_stress=acf_stress, stress=stress, ndata=ndata, vol=vol, temp=temp)
     call calc_integ_acf_stress(integ_acf_stress=integ_acf_stress, acf_stress=acf_stress, ndata=ndata, dt=dt)
     call calc_viscousity(integ_acf_stress=integ_acf_stress, viscousity=viscousity, fst_calc=fst_calc, lst_calc=lst_calc)
 
-    ! output
+    ! 出力
     call output_acf_stress(acf_stress=acf_stress, ndata=ndata, dt=dt)
     call output_integ_acf_stress(integ_acf_stress=integ_acf_stress, ndata=ndata, dt=dt)
     call output_viscousity(viscousity=viscousity)
-
-    ! end
 contains
-    subroutine input_condition(ndata, dt, vol)
-        real(real64),parameter:: an=6.0221367d+23
-        integer(int32),intent(out):: ndata
-        real(real64),intent(out):: dt, vol
-        type(condition_type):: condition
-        type(rate_type):: rate
-        type(molecular_type):: molecular
-        real(real64):: dens, tmass
-        
-        call read_input(condition, rate, molecular)
-
-        ndata = condition%nstep
-        dens = condition%dens*rate%nd
-        dt = condition%dt
-        tmass = sum(molecular%mass(:))!*r_mass
-        tmass = tmass/an/1000d0 ! g/mol => g => kg
-        vol = np*tmass/dens
-    end subroutine
-
-
     subroutine read_temp_mean(temp)
         character(100),parameter:: file_temp_mean='temp/temp_mean.dat'
         real(real64):: temp
@@ -114,21 +93,6 @@ contains
         all_calc=lst_calc-fst_calc+1
         viscousity(:) = sum(integ_acf_stress(fst_calc:lst_calc, :), dim=1) / dble(all_calc)
     end subroutine
-
-
-
-    pure function trapezoidal_integration(f,dx,n) result(g)
-        real(real64),intent(in):: f(:), dx
-        integer(int32),intent(in):: n
-        real(real64):: g(n)
-        integer(int32):: i
-
-        g(1)=0d0
-        do i=2,n
-            g(i) = g(i-1) + f(i-1) + f(i)
-        end do 
-        g(:)=g(:)*5d-1*dx
-    end function
 
 
     subroutine output_acf_stress(acf_stress, ndata, dt)

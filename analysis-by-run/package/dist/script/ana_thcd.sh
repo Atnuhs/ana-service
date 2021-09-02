@@ -4,7 +4,7 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
 
 readonly DIR_ROOT="$(cd "$(dirname "${0}")/.."; pwd)"
-readonly FILENAME_EXE="integ_acf_ej.out"
+readonly FILENAME_EXE="thcd.out"
 readonly FILENAME_RESULT="thcd"
 readonly FILE_EXE=""${DIR_ROOT}"/bin/${FILENAME_EXE}"
 readonly FILE_RESULT="${DIR_ROOT}/${FILENAME_RESULT}"
