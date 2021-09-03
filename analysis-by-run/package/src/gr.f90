@@ -51,7 +51,7 @@ contains
         integer(int32),intent(in):: ndata, np
         real(real64),intent(in):: rc, cell, dr, rxyz(:,:,:)
         real(real64),intent(inout):: gr(:)
-        real(real64):: r, r2, ri(3), rij(3)
+        real(real64):: ri(3), rij(3)
         integer(int32):: idata,id,i,j
 
         do idata=1,ndata

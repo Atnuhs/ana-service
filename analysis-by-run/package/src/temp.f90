@@ -3,13 +3,13 @@ program main
     use md_condition_for_ana_mod
     use representative_value_mod
     implicit none
-    integer(int32):: ndata,i
+    integer(int32):: ndata
     real(real64),allocatable:: temp(:)
 
     call load_condition_for_temp_ana(ndata=ndata)
     allocate(temp(ndata))
     call read_enrg(temp=temp, ndata=ndata)
-    call output_temp_mean(temp=temp, ndata=ndata)
+    call output_temp_mean(temp=temp)
 contains
     subroutine read_enrg(temp,ndata)
         character(100),parameter:: file_enrg='../enrg.dat'
@@ -26,11 +26,10 @@ contains
     end subroutine
 
 
-    subroutine output_temp_mean(temp, ndata)
+    subroutine output_temp_mean(temp)
         character(100),parameter:: file_temp_mean='temp/temp_mean.dat'
-        integer(int32),intent(in):: ndata
         real(real64),intent(in):: temp(:)
-        integer(int32):: i, u_temp_mean
+        integer(int32):: u_temp_mean
         real(real64):: temp_mean, se
 
         temp_mean = mean(temp, se)

@@ -201,7 +201,7 @@ contains
             type(rate_input_class),intent(in):: rate_input
             type(molecular_input_class),intent(in):: molecule
             type(rate_class):: rate
-            real(real64):: r_vol, r_cell
+            real(real64):: r_cell
             real(real64):: r, l, nu, dn_sigma, dn_bond_length
 
             rate%density = rate_input%number_density
@@ -275,7 +275,7 @@ contains
 
         ! copy from condition_input
         md_condition%nstep = condition_input%nstep
-        md_condition%temp0 = condition_input%nstep * rate%temperature
+        md_condition%temp0 = condition_input%temp0 * rate%temperature
         md_condition%dens = condition_input%dens * rate%density
         md_condition%dt = condition_input%dt
         md_condition%rc = condition_input%rc
@@ -390,9 +390,9 @@ contains
     end subroutine
 
 
-    subroutine load_condition_for_msd_ana(ndata, dt, intd)
+    subroutine load_condition_for_msd_ana(ndata, dt, intd, temp0, cell)
         integer(int32),intent(out):: ndata, intd
-        real(real64),intent(out):: dt
+        real(real64),intent(out):: dt, temp0, cell
         type(md_condition_class):: md_condition
 
         md_condition = generate_md_condition()
@@ -400,5 +400,7 @@ contains
         ndata = md_condition%nstep / md_condition%intd
         dt = md_condition%dt
         intd = md_condition%intd
+        temp0 = md_condition%temp0
+        cell = md_condition%system_cell()
     end subroutine
 end module

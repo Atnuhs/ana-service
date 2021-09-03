@@ -17,6 +17,7 @@ echo "##### 解析スクリプトの配布 #####"
 while read dir_analysis
 do
     echo "${dir_analysis} => $([ -d "${dir_analysis}" ] && echo 'T' || echo 'F')"
-    mkdir -p "${dir_analysis}"/{exe,script}
-    rsync -ah "${DIR_PACKAGE}/dist/" "${dir_analysis}"
+    mkdir -p "${dir_analysis}"
+    rsync -ah --delete "${DIR_PACKAGE}/dist/bin" "${dir_analysis}"
+    rsync -ah --delete "${DIR_PACKAGE}/dist/script" "${dir_analysis}"
 done < "${FILE_ALL_TASK}"

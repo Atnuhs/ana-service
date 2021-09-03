@@ -7,5 +7,5 @@ readonly DIR_SRC="${DIR_ROOT:?}/build/src"
 
 
 mkdir -p "${DIR_DIST:?}/"{bin,script}
-cp "${DIR_SRC:?}"/*.out "${DIR_DIST:?}/bin"
-cp -RT "${DIR_SCRIPT}" "${DIR_DIST}/script"
+rsync -ah --delete "${DIR_SRC:?}"/*.out "${DIR_DIST:?}/bin"
+rsync -ah --delete "${DIR_SCRIPT}/" "${DIR_DIST}/script"

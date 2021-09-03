@@ -5,7 +5,6 @@ program main
     implicit none
     integer(int32):: ndata
     integer(int32):: fst_run, lst_run, run
-    integer(int32):: fst_calc, lst_calc
     real(real64),allocatable:: x(:), integ_ej_all(:,:), integ_ej_mean(:), integ_ej_se(:)
     real(real64),allocatable:: thcd_run(:)
     real(real64):: thcd, thcd_sd
@@ -61,7 +60,7 @@ contains
     subroutine read_thcd_run(thcd)
         real(real64),intent(out):: thcd
         character(100):: file_thcd, crun
-        integer(int32):: u_thcd, i
+        integer(int32):: u_thcd
 
         write(crun,'(I2.2)') run
         file_thcd = '../calculation/run' // trim(crun) // '/Analysis/thcd/thcd.dat'
@@ -121,7 +120,7 @@ contains
     subroutine output_thcd(thcd, thcd_sd)
         character(100),parameter:: file_thcd_mean = 'thcd/thcd.txt'
         real(real64):: thcd, thcd_sd
-        integer(int32):: u_thcd_mean, i
+        integer(int32):: u_thcd_mean
 
         open(newunit=u_thcd_mean, file=file_thcd_mean, status='replace')
             write(u_thcd_mean, *) 'thcd, thcd_sd'

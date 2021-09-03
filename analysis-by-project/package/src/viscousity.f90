@@ -5,7 +5,6 @@ program main
     implicit none
     integer(int32):: ndata
     integer(int32):: fst_run, lst_run, run
-    integer(int32):: fst_calc, lst_calc
     real(real64),allocatable:: x(:), integ_stress_all(:,:), integ_stress_mean(:), integ_stress_se(:)
     real(real64),allocatable:: viscousity_run(:)
     real(real64):: viscousity, viscousity_sd
@@ -61,7 +60,7 @@ contains
     subroutine read_viscousity_run(viscousity)
         real(real64),intent(out):: viscousity
         character(100):: file_viscousity, crun
-        integer(int32):: u_viscousity, i
+        integer(int32):: u_viscousity
 
         write(crun,'(I2.2)') run
         file_viscousity = '../calculation/run' // trim(crun) // '/Analysis/viscousity/viscousity.dat'
@@ -121,7 +120,7 @@ contains
     subroutine output_viscousity(viscousity, viscousity_sd)
         character(100),parameter:: file_viscousity_mean = 'viscousity/viscousity.txt'
         real(real64):: viscousity, viscousity_sd
-        integer(int32):: u_viscousity_mean, i
+        integer(int32):: u_viscousity_mean
 
         open(newunit=u_viscousity_mean, file=file_viscousity_mean, status='replace')
             write(u_viscousity_mean, *) 'viscousity, viscousity_sd'
