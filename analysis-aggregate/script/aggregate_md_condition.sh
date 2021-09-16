@@ -25,7 +25,8 @@ while read filename_project_struct fst_run lst_run
 do
     file_project_paths="${DIR_PROJECT_PATHS}/${filename_project_struct}"
     file_project_struct="${DIR_PROJECT_STRUCT}/${filename_project_struct}"
-
+    echo -e "path\tvariable\trate\t\
+run01のstep\tstep\trun数\ttemp0\tdt\t統計量"
     while read task
     do
         project_path="${task}"

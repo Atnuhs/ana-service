@@ -9,11 +9,11 @@ program main
     real(real64),allocatable:: acf_ej(:,:)
     real(real64),allocatable:: integ_acf_ej(:,:)
     integer(int32):: ndata, fst_calc=1000, lst_calc=2000
-    real(real64):: temp, dt, vol, thcd
+    real(real64):: temp, temp0, dt, vol, thcd
 
 
     ! データの読み込み
-    call load_condition_for_thcd_ana(ndata=ndata, dt=dt, vol=vol)
+    call load_condition_for_thcd_ana(ndata=ndata, dt=dt, vol=vol, temp0=temp0)
     allocate(ej(ndata, 3))
     allocate(acf_ej(ndata, 3))
     allocate(integ_acf_ej(ndata, 3))
@@ -23,7 +23,7 @@ program main
     ! 計算
     call calc_acf_ej(acf_ej=acf_ej, ej=ej, ndata=ndata, vol=vol, temp=temp)
     call calc_integ_acf_ej(integ_acf_ej=integ_acf_ej, acf_ej=acf_ej, ndata=ndata, dt=dt)
-    call calc_thcd(integ_acf_ej=integ_acf_ej, thcd=thcd)
+    call calc_thcd(integ_acf_ej=integ_acf_ej, thcd=thcd, temp=temp, temp0=temp0)
 
     ! 出力
     call output_acf_ej(acf_ej=acf_ej, ndata=ndata, dt=dt)
@@ -80,11 +80,13 @@ contains
     end subroutine
 
 
-    subroutine calc_thcd(integ_acf_ej, thcd)
-        real(real64),intent(in):: integ_acf_ej(:,:)
+    subroutine calc_thcd(integ_acf_ej, thcd, temp, temp0)
+        real(real64),intent(in):: integ_acf_ej(:,:), temp, temp0
         real(real64),intent(out):: thcd
+        real(real64):: thcd_temp
 
-        thcd = sum(integ_acf_ej(fst_calc:lst_calc, :)) / dble(lst_calc-fst_calc+1) / 3d0
+        thcd_temp = sum(integ_acf_ej(fst_calc:lst_calc, :)) / dble(lst_calc-fst_calc+1) / 3d0
+        thcd = thcd_temp * (temp0/temp)**0.23
     end subroutine
 
 

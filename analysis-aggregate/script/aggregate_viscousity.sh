@@ -12,6 +12,7 @@ readonly FILE_RESULT="${DIR_OUTPUT}/aggregate_viscousity.tsv"
 while read filename_project_struct fst_run lst_run
 do
     file_project_paths="${DIR_PROJECT_PATHS}/${filename_project_struct}"
+    echo "${file_project_paths}"
     while read task
     do
         dir_analysis="${task}/Analysis"
