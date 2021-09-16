@@ -4,13 +4,12 @@
 # ./analysis-by-run/script/gen_task_div
 # ./analysis-by-run/script/distribute_Analysis
 # ./analysis-by-run/script/temp.sh
-# ./analysis-by-run/script/gr.sh
 # ./analysis-by-run/script/vis.sh
 # ./analysis-by-run/script/thcd.sh
 # ./analysis-by-run/script/msd.sh
 # ./analysis-by-run/script/rmsd.sh
+# ./analysis-by-run/script/vis.sh
 
-# ./analysis-by-project/script/make_task_all
 # ./analysis-by-project/script/make_task_div
 # ./analysis-by-project/script/distribute_Analysis
 # ./analysis-by-project/script/para_gr
