@@ -16,7 +16,7 @@ do
     while read task
     do
         # get output_param.dat at run01
-        dir_run01="${task}/calculation/run01"
+        dir_run01="${task}/calculation/run$(printf '%02d' $fst_run)"
         file_param="${dir_run01}/output_param.dat"
         header="$(awk '{print $1}' ${file_param} | paste -s)"
         params="$(awk '{print $2}' ${file_param} | paste -s)"
