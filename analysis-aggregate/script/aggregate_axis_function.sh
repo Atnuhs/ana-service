@@ -16,9 +16,13 @@ do
     while read task
     do
         # get output_param.dat at run01
-        dir_run01="${task}/calculation/run01"
+        dir_run01="${task}/calculation/run$(printf '%02d' $fst_run)"
         file_param="${dir_run01}/output_param.dat"
-        echo -e "${task}\t$(paste -s $file_param)"
+        header="$(awk '{print $1}' ${file_param} | paste -s)"
+        params="$(awk '{print $2}' ${file_param} | paste -s)"
+        [ "${task}" == "$(head -n 1 ${file_project_paths})" ] \
+            && echo -e "taskname\t${header}"
+        echo -e "${task}\t${params}"
 
     done < "${file_project_paths}"
 done < <(tail -n +2 "${FILE_TASK_SETTING}") | tee "${FILE_RESULT}"
