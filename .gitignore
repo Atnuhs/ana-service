@@ -57,3 +57,5 @@ _deps
 
 task/
 output/
+setting/
+dist/
