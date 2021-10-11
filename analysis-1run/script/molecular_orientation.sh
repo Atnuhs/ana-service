@@ -2,12 +2,5 @@
 set -eu -o pipefail
 trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
-readonly DIR_ROOT="$(cd "$(dirname "${0}")/.."; pwd)"
-readonly FILENAME_EXE="molecular_orientation.out"
-readonly FILENAME_RESULT="molecular_orientation"
-readonly FILE_EXE=""${DIR_ROOT}"/bin/${FILENAME_EXE}"
-readonly FILE_RESULT="${DIR_ROOT}/${FILENAME_RESULT}"
-
-mkdir -p "${FILE_RESULT}"
-cd "${DIR_ROOT}"
-"${FILE_EXE}"
+. "$(dirname $0)/lib/common.sh"
+ana "molecular_orientation.out" "molecular_orientation"

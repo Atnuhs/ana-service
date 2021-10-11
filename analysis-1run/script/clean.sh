@@ -2,9 +2,9 @@
 set -eu -o pipefail
 trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
-readonly DIR_ROOT="$(cd "$(dirname "${0}")"; pwd)"
+. "$(dirname $0)/lib/common.sh"
 
-rm -rf "${DIR_ROOT}/build"
-rm -rf "${DIR_ROOT}/dist"
-rm -f "${DIR_ROOT}/src"/*.mod
-rm -f "${DIR_ROOT}/lib"/*.mod
+rm -rf "${DIR_BUILD}"
+rm -rf "${DIR_DIST}"
+rm -f "${DIR_SRC}"/*.mod
+rm -f "${DIR_LIB}"/*.mod
