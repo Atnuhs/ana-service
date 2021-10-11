@@ -2,7 +2,7 @@ program main
     use,intrinsic :: iso_fortran_env
     use representative_value_mod
     implicit none
-    integer(int32),parameter:: gr_len=10000
+    integer(int32),parameter:: gr_len=1000
     integer(int32):: fst_run, lst_run, run
     real(real64),allocatable:: x(:), gr_all(:,:), gr_mean(:), gr_se(:)
 

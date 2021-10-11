@@ -7,7 +7,6 @@ readonly DIR_WDIR="$(pwd)"
 
 readonly DIR_SCRIPT="${DIR_ROOT}/script"
 readonly DIR_BUILD="${DIR_ROOT}/build"
-readonly DIR_DIST="${DIR_ROOT}/dist"
 readonly DIR_SRC="${DIR_ROOT}/src"
 readonly DIR_LIB="${DIR_ROOT}/lib"
 

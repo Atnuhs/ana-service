@@ -1,18 +1,13 @@
 #!/bin/bash
-set -eu -o pipefail
+set -euo pipefail
 trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
-readonly FILENAME_EXE="gr.out"
-readonly DIRNAME_RESULT="gr"
+. "$(dirname $0)/lib/common.sh"
 
-readonly DIR_SCRIPT="$(cd "$(dirname "${0}")"; pwd)"
-readonly DIR_LIB="${DIR_SCRIPT}/lib"
-
-. "${DIR_LIB}/common.sh"
+readonly DIR_OUTPUT=$(dir_output gr)
+readonly FILE_EXE=$(file_exe gr.out)
 
 read fst_run lst_run < "${FILE_ANALYSIS_RUN}"
-echo "##### dir => ${DIR_ANALYSIS}"
-mkdir -p "${DIR_RESULT}"
-
-cd "${DIR_ANALYSIS}"
+echo "##### dir => ${DIR_WDIR}"
+mkdir -p "${DIR_OUTPUT}"
 "${FILE_EXE}" <<<"${fst_run} ${lst_run}"
