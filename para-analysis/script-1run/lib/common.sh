@@ -6,15 +6,14 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 readonly DIR_ROOT="$(cd $(dirname $0)/../../..; pwd)"
 readonly DIR_ANALYSIS_SERVICE="$(cd $(dirname $0)/../..; pwd)"
 readonly DIR_PARA_ANALYSIS="$(cd $(dirname $0)/..; pwd)"
+readonly DIR_LIB=$(cd $(dirname $0); pwd)/lib
 
-readonly DIR_MD_SERVICE="${DIR_ROOT}/md-service"
 readonly DIR_CALCULATION="${DIR_ROOT}/calculation"
 
-readonly DIR_MD_SERVICE_OUTPUT="${DIR_MD_SERVICE}/output"
-readonly DIR_PROJECT_PATHS="${DIR_MD_SERVICE_OUTPUT}/project-paths"
+readonly DIR_ANALYSIS1RUN="${DIR_ANALYSIS_SERVICE}/analysis-1run"
 
-readonly FILE_TASK_SETTING="${DIR_ANALYSIS_SERVICE}/setting/target_projects.tsv"
-readonly FILE_HOSTS="${DIR_ANALYSIS_SERVICE}/setting/excution_hosts.tsv"
+readonly FILE_TASK_SETTING="${DIR_PARA_ANALYSIS}/setting/target_projects.tsv"
+readonly FILE_HOSTS="${DIR_PARA_ANALYSIS}/setting/excution_hosts.tsv"
 
 readonly DIR_TASK="${DIR_PARA_ANALYSIS}/task"
 readonly DIR_PACKAGE="${DIR_PARA_ANALYSIS}/package"
@@ -23,16 +22,24 @@ readonly FILE_ALL_TASK="${DIR_TASK}/task_all.txt"
 
 export DIR_TASK FILENAME_EXEC_SCRIPT
 
-parallel_execution() {
+mkdir -p "${DIR_TASK}"
+
+parallel_excecution() {
     set -eu
-    local host_name="${1}"
-    local num_core="${2}"
+
+    local host_name=$1
+    local num_core=$2
+    local file_excec_script=$3
+
     file_task="${DIR_TASK}/task_${host_name}.txt"
-    file_exec_script="script/${FILENAME_EXEC_SCRIPT}"
-    ssh "${host_name}" << EOF
-    cat "${file_task}" | \
-        xargs -I{} -P${num_core} -t bash {}/"${file_exec_script}"
-EOF
+    ssh "${host_name}" "${DIR_LIB}/excec_ana.sh" "${file_task}" "${num_core}" "${file_excec_script}" 
 }
 
-export -f parallel_execution
+
+file_ana_script() {
+    local filename_ana_script=$1
+    echo "${DIR_ANALYSIS1RUN}/script/${filename_ana_script}"
+}
+
+export -f parallel_excecution
+export DIR_LIB

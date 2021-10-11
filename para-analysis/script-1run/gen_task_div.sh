@@ -1,11 +1,7 @@
 #!/bin/bash
-set -eu -o pipefail
+set -euo pipefail
 trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
-
-readonly DIR_SCRIPT="$(cd $(dirname ${0}); pwd)"
-readonly DIR_LIB="${DIR_SCRIPT}/lib"
-
-. "${DIR_LIB}/common.sh"
+. "$(dirname $0)/lib/common.sh"
 
 readonly TASK_NUM="$(cat "${FILE_ALL_TASK}" | wc -l)"
 readonly ALL_CORE="$(awk '{sum+=$2} END{print sum;}' "${FILE_HOSTS}")"
