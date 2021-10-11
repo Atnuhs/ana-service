@@ -364,6 +364,19 @@ contains
     end subroutine
 
 
+    subroutine load_condition_for_molecular_orientation_ana(ndata, rc, cell)
+        integer(int32),intent(out):: ndata
+        real(real64),intent(out):: rc, cell
+        type(md_condition_class):: md_condition
+
+        md_condition = generate_md_condition()    
+        
+        ndata = md_condition%nstep / md_condition%intr
+        rc = md_condition%rc
+        cell = md_condition%system_cell()
+    end subroutine
+
+
     subroutine load_condition_for_thcd_ana(ndata, dt, vol, temp0)
         integer(int32),intent(out):: ndata
         real(real64),intent(out):: dt, vol, temp0
