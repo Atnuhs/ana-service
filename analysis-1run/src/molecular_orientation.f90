@@ -8,7 +8,7 @@ program main
     real(real64),allocatable:: rg(:,:,:), arrow(:,:,:), mo(:,:)
 
     call load_condition_for_molecular_orientation_ana(ndata, rc, cell)
-    dr = rc/dble(nlen)
+    dr = (rc/2d0)/dble(nlen) ! 0~rcの半分までをnlen刻み
     allocate(mo(90,nlen))
     allocate(rg(3,np,ndata), arrow(3,np,ndata))
     call load_rg_and_arrow(rg, arrow, ndata, np)
