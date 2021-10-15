@@ -24,9 +24,7 @@ export DIR_TASK FILENAME_EXEC_SCRIPT
 
 mkdir -p "${DIR_TASK}"
 
-parallel_excecution() {
-    set -eu
-
+parallel_machine() {
     local host_name=$1
     local num_core=$2
     local file_excec_script=$3
@@ -38,11 +36,21 @@ parallel_excecution() {
 EOF
 }
 
+parallel_analysis() {
+    local -r filename_ana_script=$1
+    local -r file_ana_script=$(file_ana_script ${filename_ana_script})
+
+    echo "##### 解析の実行 #####" && {
+        tail -n +2 "${FILE_HOSTS}" |
+            xargs -I{} -P0 -t bash -c "parallel_machine {} ${file_ana_script}"
+    }
+
+}
+
 
 file_ana_script() {
     local filename_ana_script=$1
     echo "${DIR_ANALYSIS1RUN}/script/${filename_ana_script}"
 }
 
-export -f parallel_excecution file_ana_script
-export DIR_LIB 
+export -f parallel_machine
