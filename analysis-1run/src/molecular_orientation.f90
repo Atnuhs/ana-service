@@ -27,7 +27,6 @@ contains
         integer(int32):: i,j,k,u_sxyz
 
         allocate(sxyz(3,3,np,ndata))
-        print*, 'read'
         open (newunit=u_sxyz, file='../sxyz.dat', status='old')
             do i=1,ndata
                 read(u_sxyz, *)
@@ -57,9 +56,9 @@ contains
         real(real64),intent(out):: angle
         real(real64):: costheta, rad
 
-        costheta = abs(dot_product(v1,v2)) / (norm2(v1)*norm2(v2))
+        costheta = dot_product(v1,v2)) / (norm2(v1)*norm2(v2))
 
-        if (costheta < 0 .or. costheta > 1) then
+        if (abs(costheta) > 1d0) then
             print*, '変な値でた'
             print*, costheta
             print*, v1
@@ -67,7 +66,7 @@ contains
             error stop
         end if
 
-        rad = acos(costheta)
+        rad = acos(abs(costheta))
         angle = rad * 180d0 / pi
     end subroutine
 
