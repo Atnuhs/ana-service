@@ -10,4 +10,3 @@ readonly FILE_ANA_SCRIPT=$3
 
 cat "${FILE_TASK}" |
     xargs -I{} -P${NUMCORE} -t bash {}/"${FILE_ANA_SCRIPT}"
-    

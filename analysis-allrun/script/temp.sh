@@ -3,13 +3,16 @@ set -euo pipefail
 trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
 . "$(dirname $0)/lib/common.sh"
+# このスクリプトは、倍率ディレクトリの中のAnalysisディレクトリで回す。
 
 temp () {
-    local -r fst_run=$1 lst_run=$2
+    # set -x
     local -r file_temp_mean="temp/temp_mean.txt"
     local -r file_temp_all="temp/temp_all.txt"
     local -r header='run_number\ttemperature\ttemperature_sd'
+    local fst_run lst_run
 
+    read fst_run lst_run
     echo -e ${header} | tee "${file_temp_all}"
 
     for run in $(seq -f '%02g' "${fst_run}" "${lst_run}")
@@ -25,7 +28,4 @@ temp () {
         awk -f "${FILE_STDDEV}" > "${file_temp_mean}"
 }
 
-read fst_run lst_run < "${FILE_ANALYSIS_RUN}"
-readonly DIR_OUTPUT=$(dir_output 'temp')
-mkdir -p "${DIR_OUTPUT}"
-temp $fst_run $lst_run
+ana "temp" "$(dir_output 'temp')"

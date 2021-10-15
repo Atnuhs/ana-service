@@ -28,7 +28,6 @@ contains
 
         open(newunit=u_rxyz, file='../rxyz.dat', status='old')
         do i=1,ndata
-            if (mod(i,100) == 0) print*, 'read:', i, '/', ndata
             read(u_rxyz,*)
             read(u_rxyz,*) (rxyz(:,j,i), j=1,np)
         end do
@@ -55,7 +54,6 @@ contains
         integer(int32):: idata,id,i,j
 
         do idata=1,ndata
-            if (mod(idata,100) == 0) print*, 'calc:', idata, '/', ndata
             do i=1,np
                 ri(:) = rxyz(:,i,idata)
                 do j=i+1,np

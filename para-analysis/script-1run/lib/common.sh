@@ -6,7 +6,7 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 readonly DIR_ROOT="$(cd $(dirname $0)/../../..; pwd)"
 readonly DIR_ANALYSIS_SERVICE="$(cd $(dirname $0)/../..; pwd)"
 readonly DIR_PARA_ANALYSIS="$(cd $(dirname $0)/..; pwd)"
-readonly DIR_LIB=$(cd $(dirname $0); pwd)/lib
+readonly DIR_LIB="$(cd $(dirname $0); pwd)/lib"
 
 readonly DIR_CALCULATION="${DIR_ROOT}/calculation"
 
@@ -32,7 +32,10 @@ parallel_excecution() {
     local file_excec_script=$3
 
     file_task="${DIR_TASK}/task_${host_name}.txt"
-    ssh "${host_name}" "${DIR_LIB}/excec_ana.sh" "${file_task}" "${num_core}" "${file_excec_script}" 
+    ssh "${host_name}" << EOF
+        cat ${file_task} |
+            xargs -I {} -P${num_core} -t bash -c "cd {} && ${file_excec_script}"
+EOF
 }
 
 
@@ -41,5 +44,5 @@ file_ana_script() {
     echo "${DIR_ANALYSIS1RUN}/script/${filename_ana_script}"
 }
 
-export -f parallel_excecution
-export DIR_LIB
+export -f parallel_excecution file_ana_script
+export DIR_LIB 

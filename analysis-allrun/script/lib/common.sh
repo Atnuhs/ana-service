@@ -28,7 +28,10 @@ dir_output () {
 }
 
 ana () {
-    local file_exe=$1 dir_output=$2 fst_run=$3 lst_run=$4
+    local -r file_exe=$1 dir_output=$2
+    local fst_run lst_run
+    
+    read fst_run lst_run < "${FILE_ANALYSIS_RUN}"
     mkdir -p "${dir_output}"
     "${file_exe}" <<<"${fst_run} ${lst_run}"
 }
