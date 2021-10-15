@@ -4,11 +4,12 @@ program main
     implicit none
     integer(int32),parameter:: np=500, nlen=30
     integer(int32):: ndata, i
-    real(real64):: rc, cell, dr
+    real(real64):: rc, cell, dr, max_r
     real(real64),allocatable:: rg(:,:,:), arrow(:,:,:), mo(:,:)
 
     call load_condition_for_molecular_orientation_ana(ndata, rc, cell)
-    dr = (rc/2d0)/dble(nlen) ! 0~rcの半分までをnlen刻み
+    max_r = rc*0.5d0 ! 半径どこまで見るか
+    dr = max_r/dble(nlen) ! 0~max_rをnlen刻み
     allocate(mo(90,nlen))
     allocate(rg(3,np,ndata), arrow(3,np,ndata))
     call load_rg_and_arrow(rg, arrow, ndata, np)
@@ -56,7 +57,7 @@ contains
         real(real64),intent(out):: angle
         real(real64):: costheta, rad
 
-        costheta = dot_product(v1,v2)) / (norm2(v1)*norm2(v2))
+        costheta = dot_product(v1,v2) / (norm2(v1)*norm2(v2))
 
         if (abs(costheta) > 1d0) then
             print*, '変な値でた'
@@ -80,7 +81,6 @@ contains
         real(real64):: rgi1(3),rgi1i2(3), arrowi1(3), distance, angle, v, factor, num_dens
 
         mo(:,:) = 0
-        print*, 'calc'
         do idata=1,ndata
             do i1=1,np-1
                 rgi1(:) = rg(:,i1,idata)
@@ -89,8 +89,8 @@ contains
                     rgi1i2(:) = rg(:,i2,idata) - rgi1(:)
                     distance=norm2(rgi1i2)
                     call adjust_periodic(rgi1i2, cell, rc)
-                    if (distance > rc) cycle
-                    id = ceiling(distance / dr)
+                    if (distance > max_r) cycle
+                    id = ceiling(distance / max_r)
                     call calc_angle(arrowi1, arrow(:,i2,idata), angle)
 
                     if (id > nlen) then
