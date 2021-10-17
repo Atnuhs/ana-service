@@ -31,12 +31,13 @@ parallel_machine() {
 
     file_task="${DIR_TASK}/task_${host_name}.txt"
     echo "${file_excec_script}"
-    ssh "${host_name}" << EOF
+    ssh -T "${host_name}" << EOF
         cat ${file_task} |
             xargs -I {} -P${num_core} bash -c "
                 cd {}; pwd; ${file_excec_script}
             "
 EOF
+    wait
 }
 
 parallel_analysis() {
