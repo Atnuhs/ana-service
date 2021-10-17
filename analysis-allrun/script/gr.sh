@@ -9,5 +9,4 @@ readonly LST_RUN=$2
 readonly DIR_OUTPUT=$(dir_output gr)
 readonly FILE_EXE=$(file_exe gr.out)
 
-
 ana_allrun "${FILE_EXE}" "${DIR_OUTPUT}" "${FST_RUN}" "${LST_RUN}"
