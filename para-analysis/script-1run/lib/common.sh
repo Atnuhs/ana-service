@@ -30,10 +30,12 @@ parallel_machine() {
     local file_excec_script=$3
 
     file_task="${DIR_TASK}/task_${host_name}.txt"
+    echo "${file_excec_script}"
     ssh "${host_name}" << EOF
         cat ${file_task} |
-            xargs -I {} -P${num_core} bash -c "cd {} &&
-            ${file_excec_script}"
+            xargs -I {} -P${num_core} bash -c "
+                cd {}; pwd; ${file_excec_script}
+            "
 EOF
 }
 
@@ -43,7 +45,7 @@ parallel_analysis() {
 
     echo "##### 解析の実行 #####" && {
         tail -n +2 "${FILE_HOSTS}" |
-            xargs -I{} -P0 -t bash -c "parallel_machine {} ${file_ana_script}"
+            xargs -I{} -P0 bash -c "parallel_machine {} ${file_ana_script}"
     }
 
 }
