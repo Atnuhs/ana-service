@@ -1,18 +1,20 @@
 #!/bin/bash
-set -eu -o pipefail
+set -euo pipefail
 trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
+. "$(dirname $0)/lib/common_allrun.sh"
 
-readonly DIR_SCRIPT="$(cd $(dirname ${0}); pwd)"
-readonly DIR_LIB="${DIR_SCRIPT}/lib"
-readonly FILENAME_EXEC_SCRIPT='ana_gr.sh' 
-. "${DIR_LIB}/common.sh"
+file_project_paths () {
+    local -r dir_project_paths="${DIR_ROOT}/md-service/output/project-paths"
+    local -r filename_project_paths=$1
+    echo "${dir_project_paths}/${filename_project_paths}"
+}
+
 
 while read filename_project_struct fst_run lst_run
 do
-    FILE_PROJECT_PATHS="${DIR_PROJECT_PATHS:?}/${filename_project_struct:?}"
     while read task
     do
-        echo -e "${task:?}/Analysis\t${fst_run}\t${lst_run}"  
-    done < "${FILE_PROJECT_PATHS:?}"
+        echo -e "${task:?}/Analysis\t${fst_run}\t${lst_run}"
+    done < "$(file_project_paths ${filename_project_struct})"
+done < <(tail -n +2 "${FILE_TASK_SETTING}") | tee "${FILE_TASK_ALL}"
 
-done < <(tail -n +2 "${FILE_TASK_SETTING:?}") | tee "${FILE_ALL_TASK:?}"
