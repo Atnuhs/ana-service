@@ -32,7 +32,8 @@ parallel_machine() {
     file_task="${DIR_TASK}/task_${host_name}.txt"
     ssh "${host_name}" << EOF
         cat ${file_task} |
-            xargs -I {} -P${num_core} -t bash -c "cd {} && ${file_excec_script}"
+            xargs -I {} -P${num_core} bash -c "cd {} &&
+            ${file_excec_script}"
 EOF
 }
 
