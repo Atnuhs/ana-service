@@ -6,21 +6,37 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
 mkdir -p "${DIR_TASK}"
 
-export DIR_TASK FILENAME_EXEC_SCRIPT
 
-parallel_execution() {
-    set -eu
-    host_name="${1}"
-    num_core="${2}"
-    filename_task="task_${host_name}.tsv"
-    file_task="${DIR_TASK}/${filename_task}"
-    tasks=$(cat "${file_task}" | awk '{print $1}')
-    ssh "${host_name}" << EOF
-    echo "${tasks}" | \
-        xargs -I {} -P${num_core} bash {}/script/${FILENAME_EXEC_SCRIPT}
+parallel_machine() {
+    local host_name=$1
+    local num_core=$2
+    local file_excec_script=$3
+
+    file_task="${DIR_TASK}/task_${host_name}.tsv"
+    echo "${file_excec_script}"
+    ssh -T "${host_name}" << EOF
+        cat ${file_task} |
+            xargs -L1 -P${num_core} bash -c "
+                cd \\\$0; pwd; ${file_excec_script} \\\$1 \\\$2
+            "
 EOF
 }
 
+parallel_analysis() {
+    local -r filename_ana_script=$1
+    local -r file_ana_script=$(file_ana_script ${filename_ana_script})
+
+    echo "##### 解析の実行 #####" && {
+        tail -n +2 "${FILE_HOSTS}" |
+            xargs -I{} -P0 bash -c "parallel_machine {} ${file_ana_script}"
+    }
+
+}
 
 
-export -f parallel_execution
+file_ana_script() {
+    local filename_ana_script=$1
+    echo "${DIR_ANALYSISALLRUN}/script/${filename_ana_script}"
+}
+
+export -f parallel_machine

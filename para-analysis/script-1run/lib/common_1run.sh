@@ -19,7 +19,6 @@ parallel_machine() {
                 cd {}; pwd; ${file_excec_script}
             "
 EOF
-    wait
 }
 
 parallel_analysis() {
