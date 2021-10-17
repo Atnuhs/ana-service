@@ -27,16 +27,15 @@ dir_output () {
     echo "${DIR_WDIR}/${dirname_output}"
 }
 
-ana () {
-    local -r file_exe=$1 dir_output=$2
-    local fst_run lst_run
-    
-    read fst_run lst_run < "${FILE_ANALYSIS_RUN}"
+ana_allrun () {
+    local -r file_exe=$1 dir_output=$2 fst_run=$3 lst_run=$4
+    # 実行ファイルパス 結果ディレクトリのパス スタート、エンドRun数
+
     mkdir -p "${dir_output}"
     "${file_exe}" <<<"${fst_run} ${lst_run}"
 }
 
 split_file() {
-    sp="${1}"
+    sp=$1 # 何行おきにの出力か
     awk "NR%${sp}==1"
 }

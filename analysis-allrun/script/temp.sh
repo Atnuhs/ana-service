@@ -3,6 +3,9 @@ set -euo pipefail
 trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
 . "$(dirname $0)/lib/common.sh"
+
+readonly FST_RUN=$1
+readonly LST_RUN=$2
 # このスクリプトは、倍率ディレクトリの中のAnalysisディレクトリで回す。
 
 temp () {
@@ -28,4 +31,4 @@ temp () {
         awk -f "${FILE_STDDEV}" > "${file_temp_mean}"
 }
 
-ana "temp" "$(dir_output 'temp')"
+ana_allrun "temp" "$(dir_output 'temp')" "${FST_RUN}" "${LST_RUN}"
