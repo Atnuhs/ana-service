@@ -1,8 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
-
-. "$(dirname $0)/lib/common.sh"
+. "$(dirname $0)/lib/common_1run.sh"
 
 all_task_num () { cat "${FILE_TASK_ALL}" | wc -l ;}
 all_core_num () { awk '{sum+=$2} END{print sum;}' "${FILE_HOSTS}" ;}
