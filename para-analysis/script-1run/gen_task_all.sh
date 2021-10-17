@@ -20,4 +20,4 @@ do
             echo $dir_analysis
         done
     done < "$(file_project_paths ${filename_project_struct})"
-done < <(tail -n +2 "${FILE_TASK_SETTING}") | tee "${FILE_ALL_TASK}"
+done < <(tail -n +2 "${FILE_TASK_SETTING}") | tee "${FILE_TASK_ALL}}"
