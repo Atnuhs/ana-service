@@ -18,7 +18,7 @@ readonly FILE_HOSTS="${DIR_PARA_ANALYSIS}/setting/excution_hosts.tsv"
 readonly DIR_TASK="${DIR_PARA_ANALYSIS}/task"
 readonly DIR_PACKAGE="${DIR_PARA_ANALYSIS}/package"
 
-readonly FILE_ALL_TASK="${DIR_TASK}/task_all.txt"
+readonly FILE_TASK_ALL="${DIR_TASK}/task_all.txt"
 
 export DIR_TASK FILENAME_EXEC_SCRIPT
 
