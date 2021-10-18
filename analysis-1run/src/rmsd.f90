@@ -7,13 +7,13 @@ program main
     implicit none
     integer(int32),parameter:: np = 500
     integer(int32):: ndata, intd
-    real(real64):: dt, rdc, temp0, temp, cell, viscousity
+    real(real64):: dt, rdc, temp0, temp
     real(real64), allocatable:: tdphi(:,:,:)
     real(real64), allocatable:: rmsd(:,:,:)
     real(real64), allocatable:: mean_rmsd(:), std_rmsd(:)
 
     ! インプットの読み込みなどの準備
-    call load_condition_for_msd_ana(ndata, dt, intd, temp0, cell)
+    call load_condition_for_rmsd_ana(ndata, dt, intd, temp0)
     allocate(tdphi(ndata, np, 3))
     allocate(rmsd(ndata, np, 3))
     allocate(mean_rmsd(ndata), std_rmsd(ndata))
@@ -25,7 +25,7 @@ program main
     call calc_rmsd(rmsd=rmsd, tdphi=tdphi, ndata=ndata, np=np)
     call calc_mean_rmsd(mean_rmsd=mean_rmsd, std_rmsd=std_rmsd, rmsd=rmsd, ndata=ndata, np=np)
     call calc_rdc(ndata=ndata, dt=dt, intd=intd, temp=temp, temp0=temp0, &
-    & cell=cell, viscousity=viscousity, mean_rmsd=mean_rmsd, rdc=rdc)
+    & mean_rmsd=mean_rmsd, rdc=rdc)
 
     ! 出力
     call output_mean_rmsd(mean_rmsd=mean_rmsd, std_rmsd=std_rmsd, ndata=ndata, dt=dt, intd=intd)
@@ -47,7 +47,7 @@ contains
         character(100),parameter:: file_tdphi='../tdphi.dat'
         real(real64),intent(out):: tdphi(:,:,:)
         integer(int32),intent(in):: np, ndata
-        integer(int32):: u_tdphi, i, j, k, j1, j2, c
+        integer(int32):: u_tdphi, i, j, j1, j2, c
 
         open(newunit=u_tdphi, file=file_tdphi, status='old')
             c=0
@@ -100,17 +100,17 @@ contains
     end subroutine
 
 
-    subroutine calc_rdc(ndata, dt, intd, temp, temp0, cell, viscousity, mean_rmsd, rdc)
+    subroutine calc_rdc(ndata, dt, intd, temp, temp0, mean_rmsd, rdc)
         real(real64),parameter:: kb = 1.38064852e-23
         real(real64),parameter:: pi = acos(-1d0)
         real(real64),parameter:: zeta = 2.837297d0
 
         real(real64),intent(out):: rdc
         integer(int32),intent(in):: ndata, intd
-        real(real64),intent(in):: mean_rmsd(ndata), dt, temp0, temp, cell, viscousity
+        real(real64),intent(in):: mean_rmsd(ndata), dt, temp0, temp
 
         integer(int32):: l,r,n,i
-        real(real64):: a, x(ndata), rdc_pbc, rdc_temp
+        real(real64):: a, x(ndata), rdc_temp
 
         x(:) = [(dt*dble(intd*(i-1)), i=1,ndata)]
         l = ndata/10

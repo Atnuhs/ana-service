@@ -377,6 +377,19 @@ contains
     end subroutine
 
 
+    subroutine load_condition_for_GK_thcd_ana(ndata, dt, vol)
+        integer(int32),intent(out):: ndata
+        real(real64),intent(out):: dt, vol
+        type(md_condition_class):: md_condition
+
+        md_condition = generate_md_condition()
+
+        ndata = md_condition%nstep
+        dt = md_condition%dt
+        vol = md_condition%system_volume()
+    end subroutine
+
+
     subroutine load_condition_for_thcd_ana(ndata, dt, vol, temp0)
         integer(int32),intent(out):: ndata
         real(real64),intent(out):: dt, vol, temp0
@@ -416,5 +429,19 @@ contains
         intd = md_condition%intd
         temp0 = md_condition%temp0
         cell = md_condition%system_cell()
+    end subroutine
+
+
+    subroutine load_condition_for_rmsd_ana(ndata, dt, intd, temp0)
+        integer(int32),intent(out):: ndata, intd
+        real(real64),intent(out):: dt, temp0
+        type(md_condition_class):: md_condition
+
+        md_condition = generate_md_condition()
+
+        ndata = md_condition%nstep / md_condition%intd
+        dt = md_condition%dt
+        intd = md_condition%intd
+        temp0 = md_condition%temp0
     end subroutine
 end module
