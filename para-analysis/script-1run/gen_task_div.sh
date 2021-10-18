@@ -5,7 +5,7 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
 all_task_num () { cat "${FILE_TASK_ALL}" | wc -l ;}
 all_core_num () { awk '{sum+=$2} END{print sum;}' "${FILE_HOSTS}" ;}
-file_task () { echo "${DIR_TASK}/task_${1}.tsv" ;}
+file_task () { echo "${DIR_TASK}/task_${1}.txt" ;}
 
 is_last_host_name () {
     declare -r HOST_NAME=$1
