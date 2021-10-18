@@ -21,5 +21,6 @@ ADDEXE(msd                   md_condition_for_ana_mod fft_mod mean_square_displa
 ADDEXE(rmsd                  md_condition_for_ana_mod fft_mod mean_square_displacement_mod representative_value_mod)
 ADDEXE(GK_thcd               md_condition_for_ana_mod fft_mod numerical_integration_mod)
 ADDEXE(thcd                  md_condition_for_ana_mod)
+ADDEXE(GK_viscousity            md_condition_for_ana_mod fft_mod numerical_integration_mod)
 ADDEXE(viscousity            md_condition_for_ana_mod fft_mod numerical_integration_mod)
 

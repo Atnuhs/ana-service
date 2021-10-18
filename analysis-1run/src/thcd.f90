@@ -1,6 +1,7 @@
 program main
     use, intrinsic:: iso_fortran_env
     use md_condition_for_ana_mod
+    ! 熱流の自己相関関数の積分値を読み込んでthcdを計算
     implicit none
     real(real64),allocatable:: integ_acf_ej(:)
     integer(int32):: ndata, fst_calc=3000, lst_calc=6000
