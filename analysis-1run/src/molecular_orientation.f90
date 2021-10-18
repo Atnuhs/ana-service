@@ -8,7 +8,7 @@ program main
     real(real64),allocatable:: rg(:,:,:), arrow(:,:,:), mo(:,:)
 
     call load_condition_for_molecular_orientation_ana(ndata, rc, cell)
-    max_r = rc*0.5d0 ! 半径どこまで見るか
+    max_r = rc / 3d0 ! 半径どこまで見るか
     dr = max_r/dble(nlen) ! 0~max_rをnlen刻み
     allocate(mo(90,nlen))
     allocate(rg(3,np,ndata), arrow(3,np,ndata))
@@ -77,8 +77,9 @@ contains
         real(real64),intent(out):: mo(:,:)
         integer(int32),intent(in):: np, ndata
         real(real64),intent(in):: rc, cell, rg(:,:,:), arrow(:,:,:)
-        integer(int32):: idata, i1, i2, id, iangle, i, j
-        real(real64):: rgi1(3),rgi1i2(3), arrowi1(3), distance, angle, v, factor, num_dens
+        integer(int32):: idata, i1, i2, idistance, iangle, i
+        real(real64):: rgi1(3),rgi1i2(3), arrowi1(3), distance, angle
+        real(real64):: this_v, factor, nd
 
         mo(:,:) = 0
         do idata=1,ndata
@@ -87,40 +88,46 @@ contains
                 arrowi1(:) = arrow(:,i1,idata)
                 do i2=i1+1,np
                     rgi1i2(:) = rg(:,i2,idata) - rgi1(:)
-                    distance=norm2(rgi1i2)
                     call adjust_periodic(rgi1i2, cell, rc)
-                    if (distance > max_r) cycle
-                    id = ceiling(distance / max_r)
+
+                    ! 距離の計算
+                    distance = norm2(rgi1i2)
+                    idistance = ceiling(distance / dr)
+                    if (idistance > nlen) cycle
+
+                    ! 角度の計算
                     call calc_angle(arrowi1, arrow(:,i2,idata), angle)
-
-                    if (id > nlen) then
-                        print*, 'skip', i1, i2, id
-                        cycle
-                    end if  
-
                     iangle = ceiling(angle)
-
                     if (iangle < 1 .or. iangle > 90) then
                         print*, 'iangle 値が変'
                         print*, i1, i2, angle, iangle
                         error stop
                     end if
 
-                    mo(iangle, id) = mo(iangle, id) + 2d0
+                    mo(iangle, idistance) = mo(iangle, idistance) + 2d0
                 end do
             end do
         end do
 
-        ! normalize 
-        ! num_dens = dble(np) / (cell**3)
-        ! mo(:,:) = mo(:,:) / (dble(ndata*np)*num_dens)
-        factor=4d0/3d0*pi * dr*dr*dr
+        ! normalize
+        mo(:,:) = mo(:,:) / dble(ndata)
 
+        ! 球殻に対して数密度の規格化
+        factor = 4d0/3d0*pi * dr*dr*dr ! 球殻の体積を求めるときの係数部分
+        nd = dble(np) / (cell**3) ! Number Density
+        
         do i=1,nlen
-            v = factor * dble(3*i*(i-1)+1) / (cell**3)
-            do j=1,90
-                mo(j,i) = mo(j,i) / v / sin((dble(j)-0.5d0)/180d0*pi)
-            end do
+            this_v = factor * dble(3*i*(i-1)+1) ! i番目の球殻の体積
+            mo(:,i) = (mo(:,i) / this_v) / nd ! i番目の球殻の数密度 / 全体の数密度
         end do
+        
+        ! 角度に対して数密度の規格化
+        do i=1,90
+            ! x軸からの角度がi-1°~i°の扇形をx軸を回転軸として回転させた時の体積
+            ! 規格化のため、半球の体積が1となるような半径を用いる
+            this_v = cos(dble(i-1)*pi/180d0) - cos(dble(i)*pi/180d0)
+            mo(i,:) = mo(i,:) / this_v
+        end do
+
     end subroutine
 end program main
