@@ -12,13 +12,24 @@ parallel_machine() {
     local file_excec_script=$3
 
     file_task="${DIR_TASK}/task_${host_name}.txt"
-    echo "${file_excec_script}"
     ssh -T "${host_name}" << EOF
         cat ${file_task} |
             xargs -I {} -P${num_core} bash -c "
-                cd {}; pwd; ${file_excec_script}
+                mkdir -p {}
+                cd {}
+                echo ${file_excec_script##*/}: {}
+                ${file_excec_script}
             "
 EOF
+}
+
+clean_analysis() {
+    set -x
+    local file_task="${DIR_TASK}/task_all.txt"
+    while read line
+    do
+        [ -e "${line}" ] && rm -r "${line}"
+    done < <(cat ${file_task})
 }
 
 parallel_analysis() {
