@@ -2,7 +2,7 @@ program main
     use,intrinsic :: iso_fortran_env
     use representative_value_mod
     implicit none
-    integer(int32),parameter:: mo_len=30
+    integer(int32),parameter:: mo_len=100
     integer(int32):: fst_run, lst_run, run
     real(real64),allocatable:: x(:), mo_all(:,:,:), mo_mean(:,:), mo_se(:,:)
 
@@ -54,7 +54,9 @@ contains
 
         open(newunit=u_mo_mean, file=file_gr_mean, status='replace')
             do i=1,90
-                write(u_mo_mean, *) x(i), (mo_mean(i,j), mo_se(i,j), j=1,mo_len)
+                do j=1,90
+                    write(u_mo_mean, *) x(i), mo_mean(i,j), mo_se(i,j)
+                end do
             end do
         close(u_mo_mean)
     end subroutine

@@ -13,8 +13,8 @@ readonly DIR_CALCULATION="${DIR_ROOT}/calculation"
 readonly DIR_ANALYSIS1RUN="${DIR_ANALYSIS_SERVICE}/analysis-1run"
 readonly DIR_ANALYSISALLRUN="${DIR_ANALYSIS_SERVICE}/analysis-allrun"
 
-readonly FILE_TASK_SETTING="${DIR_PARA_ANALYSIS}/setting/target_projects.tsv"
-readonly FILE_HOSTS="${DIR_PARA_ANALYSIS}/setting/excution_hosts.tsv"
+readonly FILE_TASK_SETTING="${DIR_ANALYSIS_SERVICE}/setting/target_projects.tsv"
+readonly FILE_HOSTS="${DIR_ANALYSIS_SERVICE}/setting/excution_hosts.tsv"
 
 readonly DIR_TASK="${DIR_PARA_ANALYSIS}/task"
 readonly DIR_PACKAGE="${DIR_PARA_ANALYSIS}/package"

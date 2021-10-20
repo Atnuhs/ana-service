@@ -1,11 +1,9 @@
 #!/bin/bash
-set -eu -o pipefail
+set -euo pipefail
 trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
+. "$(dirname $0)/lib/common.sh"
 
-readonly DIR_SCRIPT="$(cd $(dirname ${0}); pwd)"
-readonly DIR_LIB="${DIR_SCRIPT}/lib"
 
-. "${DIR_LIB}/common.sh"
 readonly FILE_RESULT="${DIR_OUTPUT}/aggregate_axis_function.tsv"
 
 

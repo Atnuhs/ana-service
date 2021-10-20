@@ -2,13 +2,13 @@ program main
     use,intrinsic :: iso_fortran_env
     use md_condition_for_ana_mod
     implicit none
-    integer(int32),parameter:: np=500, nlen=30
+    integer(int32),parameter:: np=500, nlen=100
     integer(int32):: ndata, i
     real(real64):: rc, cell, dr, max_r
     real(real64),allocatable:: rg(:,:,:), arrow(:,:,:), mo(:,:)
 
     call load_condition_for_molecular_orientation_ana(ndata, rc, cell)
-    max_r = rc / 3d0 ! 半径どこまで見るか
+    max_r = rc / 2d0 ! 半径どこまで見るか
     dr = max_r/dble(nlen) ! 0~max_rをnlen刻み
     allocate(mo(90,nlen))
     allocate(rg(3,np,ndata), arrow(3,np,ndata))

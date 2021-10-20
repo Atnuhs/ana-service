@@ -5,11 +5,11 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
 # 準備
 $(dirname $0)/../../analysis-allrun/script/build.sh
-# $(dirname $0)/make_task_all.sh
-# $(dirname $0)/make_task_div.sh
+$(dirname $0)/make_task_all.sh
+$(dirname $0)/make_task_div.sh
 
 # 解析の削除
-clean_analysis # [!注意!] taskのAnalysisを全部消す
+# clean_analysis # [!注意!] taskのAnalysisを全部消す
 
 # 解析
 parallel_analysis 'temp.sh'
