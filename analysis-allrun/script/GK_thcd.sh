@@ -6,8 +6,8 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
 readonly FST_RUN=$1
 readonly LST_RUN=$2
-readonly DIR_OUTPUT=$(dir_output thcd)
-readonly FILE_EXE=$(file_exe thcd.out)
+readonly DIR_OUTPUT=$(dir_output GK_thcd)
+readonly FILE_EXE=$(file_exe GK_thcd.out)
 
 ana_allrun "${FILE_EXE}" "${DIR_OUTPUT}" "${FST_RUN}" "${LST_RUN}"
 
