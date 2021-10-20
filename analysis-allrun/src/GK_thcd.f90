@@ -61,7 +61,7 @@ contains
 
 
     subroutine output_integ_ej_mean(x, integ_ej_mean, integ_ej_se, ndata)
-        character(100),parameter:: file_thcd_mean = 'thcd/integ_ej_mean.txt'
+        character(100),parameter:: file_thcd_mean = 'GK_thcd/integ_ej_mean.txt'
         integer(int32),intent(in):: ndata
         real(real64), intent(in):: x(:), integ_ej_mean(:), integ_ej_se(:)
         integer(int32):: u_thcd_mean, i

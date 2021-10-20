@@ -6,7 +6,7 @@ program main
     integer(int32):: fst_run, lst_run
     read*, fst_run, lst_run
     call generate_thcd_from_run_thcd(fst_run, lst_run)
-    call generate_thcd_from_integ_ac_ej_mean()
+    call generate_thcd_from_gk_thcd()
 contains
     subroutine generate_thcd_from_run_thcd(fst_run, lst_run)
         integer(int32),intent(in):: fst_run, lst_run
@@ -59,7 +59,7 @@ contains
     end subroutine
 
 
-    subroutine generate_thcd_from_integ_ac_ej_mean()
+    subroutine generate_thcd_from_gk_thcd()
         integer(int32),parameter:: fst_calc=3000, lst_calc=6000, all_calc=lst_calc-fst_calc+1
         integer(int32):: ndata
         real(real64),allocatable:: integ_ej_mean(:), integ_ej_se(:), x(:)
