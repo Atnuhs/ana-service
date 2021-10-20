@@ -19,5 +19,6 @@ ADDEXE(molecular_orientation read_condition_mod representative_value_mod)
 ADDEXE(msd read_condition_mod representative_value_mod)
 ADDEXE(rmsd read_condition_mod representative_value_mod)
 ADDEXE(thcd read_condition_mod representative_value_mod)
+ADDEXE(GK_thcd read_condition_mod representative_value_mod)
 ADDEXE(viscousity read_condition_mod representative_value_mod)
 
