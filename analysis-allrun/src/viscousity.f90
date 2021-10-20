@@ -50,7 +50,7 @@ contains
         integer(int32):: u_viscousity, i
 
         write(crun,'(I2.2)') run
-        file_viscousity = '../calculation/run' // trim(crun) // '/Analysis/viscousity/integ_acf_stress.dat'
+        file_viscousity = '../calculation/run' // trim(crun) // '/Analysis/GK_viscousity/integ_acf_stress.dat'
         open(newunit=u_viscousity, file=file_viscousity, status='old')
             read(u_viscousity, *) (x(i), viscousity(i), i=1,ndata)
         close(u_viscousity)

@@ -26,12 +26,10 @@ program main
     print*, 'calc'
     call calc_integ_ej_mean(integ_ej_all, integ_ej_mean, integ_ej_se)
     call calc_thcd(thcd_run, thcd, thcd_sd, fst_run, lst_run)
-
     print*, 'output'
     call output_integ_ej_mean(x, integ_ej_mean, integ_ej_se, ndata)
     call output_integ_ej_all(x, integ_ej_all, ndata)
     call output_thcd(thcd, thcd_sd)
-
     print*, 'end'
 contains
     subroutine input_condition(ndata)
@@ -50,7 +48,7 @@ contains
         integer(int32):: u_thcd, i
 
         write(crun,'(I2.2)') run
-        file_thcd = '../calculation/run' // trim(crun) // '/Analysis/thcd/integ_acf_ej.dat'
+        file_thcd = '../calculation/run' // trim(crun) // '/Analysis/GK_thcd/integ_acf_ej.dat'
         open(newunit=u_thcd, file=file_thcd, status='old')
             read(u_thcd, *) (x(i), thcd(i), i=1,ndata)
         close(u_thcd)

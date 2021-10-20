@@ -17,7 +17,10 @@ parallel_machine() {
     ssh -T "${host_name}" << EOF
         cat ${file_task} |
             xargs -L1 -P${num_core} bash -c "
-                cd \\\$0; pwd; ${file_excec_script} \\\$1 \\\$2
+                mkdir -p \\\$0
+                cd \\\$0
+                echo ${file_excec_script##*/}: \\\$0
+                ${file_excec_script} \\\$1 \\\$2
             "
 EOF
 }
@@ -31,6 +34,16 @@ parallel_analysis() {
             xargs -I{} -P0 bash -c "parallel_machine {} ${file_ana_script}"
     }
 
+}
+
+
+clean_analysis() {
+    set -x
+    local file_task="${DIR_TASK}/task_all.txt"
+    while read path fst_run lst_run
+    do
+        [ -e "${path}" ] && rm -r "${path}"
+    done < <(cat ${file_task})
 }
 
 
