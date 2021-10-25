@@ -14,7 +14,7 @@ contains
         len_arr = dble(size(arr))
         m = sum(arr)/len_arr
         m2 = sum(arr*arr)/len_arr
-        cv = m2 - m*m
+        cv = abs(m2 - m*m)
         csd = sqrt(cv)
         if (present(v)) v = cv
         if (present(sd)) sd = csd
