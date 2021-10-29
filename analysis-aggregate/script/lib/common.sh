@@ -6,6 +6,8 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 readonly DIR_ROOT="$(cd $(dirname $0)/../../..; pwd)"
 readonly DIR_ANALYSIS_SERVICE="$(cd $(dirname $0)/../..; pwd)"
 readonly DIR_AGGREGATE="$(cd $(dirname $0)/..; pwd)"
+readonly DIR_SCRIPT="$(cd $(dirname $0); pwd)"
+readonly DIR_LIB="${DIR_SCRIPT}/lib"
 
 readonly DIR_MD_SERVICE="${DIR_ROOT}/md-service"
 readonly DIR_CALCULATION="${DIR_ROOT}/calculation"
