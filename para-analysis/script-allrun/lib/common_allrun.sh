@@ -12,7 +12,11 @@ parallel_machine() {
     local num_core=$2
     local file_excec_script=$3
 
-    file_task="${DIR_TASK}/task_${host_name}.tsv"
+    local file_task="${DIR_TASK}/task_${host_name}.tsv"
+    local num_task="$(cat ${file_task} | wc -l)"
+
+    [[ ${num_task} == 0 ]] && return 0
+    
     echo "${file_excec_script}"
     ssh -T "${host_name}" << EOF
         cat ${file_task} |

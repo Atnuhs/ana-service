@@ -16,7 +16,7 @@ temp () {
     local fst_run= lst_run
 
     read fst_run lst_run
-    echo -e ${header} | tee "${file_temp_all}"
+    echo -e ${header} > tee "${file_temp_all}"
 
     for run in $(seq -f '%02g' "${fst_run}" "${lst_run}")
     do
@@ -24,7 +24,7 @@ temp () {
         file_run_temp_mean="${dir_run_ana}/temp/temp_mean.dat"
         read temp temp_sd < "${file_run_temp_mean}"
         echo -e "run${run}\t${temp}\t${temp_sd}"
-    done | tee -a "${file_temp_all}"
+    done >> "${file_temp_all}"
 
     tail -n +2 "${file_temp_all}" |
         awk '{print $2}' |

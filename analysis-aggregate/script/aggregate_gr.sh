@@ -23,7 +23,6 @@ do
             ' "${file_iemls}") > "${FILE_RESULT}.tmp"
             
             mv "${FILE_RESULT}.tmp" "${FILE_RESULT}"
-
         else
             header="$(echo -e "x\ty_${rate}\tyse_${rate}")"
             awk -v header="${header}" '

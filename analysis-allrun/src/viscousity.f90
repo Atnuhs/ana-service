@@ -17,7 +17,6 @@ contains
         real(real64):: viscousity, viscousity_sd
 
         do run=fst_run, lst_run
-            print*, 'read run =>', run
             call read_viscousity_run(viscousity_run(run), run)
         end do
     
