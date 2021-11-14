@@ -13,7 +13,7 @@ program main
     allocate(mo1(90,nlen), mo2(90,nlen))
     allocate(rg(3,np,ndata), arrow(3,np,ndata))
     call load_rg_and_arrow(rg, arrow, ndata, np)
-    call calc_molecular_orientation(rg, arrow, mo1, mo2, np, ndata, rc, cell)
+    call calc_molecular_orientation(rg, arrow, mo1, mo2, np, ndata, cell)
 
     open(unit=11, file='molecular_orientation/molecular_orientation.dat', status='replace')
         do i=1,90
@@ -104,11 +104,11 @@ contains
     end subroutine
 
 
-    subroutine calc_molecular_orientation(rg, arrow, mo1, mo2, np, ndata, rc, cell)
+    subroutine calc_molecular_orientation(rg, arrow, mo1, mo2, np, ndata, cell)
         real(real64), parameter:: pi = acos(-1d0) 
         real(real64),intent(out):: mo1(:,:), mo2(:,:)
         integer(int32),intent(in):: np, ndata
-        real(real64),intent(in):: rc, cell, rg(:,:,:), arrow(:,:,:)
+        real(real64),intent(in):: cell, rg(:,:,:), arrow(:,:,:)
         integer(int32):: idata, i1, i2, idistance, iangle, i
         integer(int32):: pair_list(2, np*np), pl_len
         real(real64):: this_rg(3,np), this_arrow(3,np)
@@ -117,10 +117,11 @@ contains
         real(real64):: this_v, factor, nd
 
         mo1(:,:) = 0
+        mo2(:,:) = 0
         do idata=1,ndata
             this_rg(:,:) = rg(:,:,idata)
             this_arrow(:,:) = arrow(:,:,idata)
-            call make_pair_list(this_rg(:,:), cell, rc, pair_list, pl_len)
+            call make_pair_list(this_rg(:,:), cell, pair_list, pl_len)
 
             do i=1,pl_len
                 i1 = pair_list(1,i)
@@ -150,6 +151,7 @@ contains
 
         ! normalize
         mo1(:,:) = mo1(:,:) / dble(ndata)
+        mo2(:,:) = mo2(:,:) / dble(ndata)
 
         ! 球殻に対して数密度の規格化
         factor = 4d0/3d0*pi * dr*dr*dr ! 球殻の体積を求めるときの係数部分
