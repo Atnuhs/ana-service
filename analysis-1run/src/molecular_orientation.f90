@@ -133,16 +133,17 @@ contains
                 idistance = ceiling(distance / dr)
                 if (idistance > nlen) cycle
 
-                ! 軸-軸角度
+                ! 軸1-軸2角度
                 call calc_angle(this_arrow(:,i1), this_arrow(:,i2), angle)
                 iangle = ceiling(angle)
                 mo1(iangle, idistance) = mo1(iangle, idistance) + 2d0
 
-                ! 軸-重心12角度
+                ! 軸1-重心12角度
                 call calc_angle(this_arrow(:,i1), rg12(:), angle)
                 iangle = ceiling(angle)
                 mo2(iangle, idistance) = mo2(iangle, idistance) + 1d0
 
+                ! 軸2-重心21角度
                 call calc_angle(this_arrow(:,i2), -rg12(:), angle)
                 iangle = ceiling(angle)
                 mo2(iangle, idistance) = mo2(iangle, idistance) + 1d0
