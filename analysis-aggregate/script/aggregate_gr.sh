@@ -13,14 +13,14 @@ do
     while read task
     do
         rate="${task##*/}"
-        file_iemls="${task}/Analysis/gr/gr_mean.txt"
+        file_gr="${task}/Analysis/gr/gr_mean.txt"
 
         if [ -f "${FILE_RESULT}" ]; then
             header="$(echo -e "y_${rate}\tyse_${rate}")"
             paste "${FILE_RESULT}" <(awk -v header="${header}" '
                 BEGIN{OFS="\t"; print header}
                 {print $2, $3}
-            ' "${file_iemls}") > "${FILE_RESULT}.tmp"
+            ' "${file_gr}") > "${FILE_RESULT}.tmp"
             
             mv "${FILE_RESULT}.tmp" "${FILE_RESULT}"
 
@@ -29,7 +29,7 @@ do
             awk -v header="${header}" '
                 BEGIN{OFS="\t"; print header}
                 {print $1, $2, $3}
-            ' "${file_iemls}" >"${FILE_RESULT}"
+            ' "${file_gr}" >"${FILE_RESULT}"
         fi
     done < "${file_project_paths}"
 done < <(tail -n +2 "${FILE_TASK_SETTING}")

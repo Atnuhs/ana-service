@@ -82,8 +82,8 @@ contains
     end subroutine
 
 
-    subroutine  make_pair_list(rg, cell, rc, pair_list, pl_len)
-        real(real64), intent(in):: rg(:,:), cell, rc
+    subroutine  make_pair_list(rg, cell, pair_list, pl_len)
+        real(real64), intent(in):: rg(:,:), cell
         integer(int32),intent(out):: pair_list(:,:), pl_len
         integer(int32):: i, j
         real(real64):: rg1(3), rg2(3), rg12(3)
@@ -140,7 +140,11 @@ contains
                 ! 軸-重心12角度
                 call calc_angle(this_arrow(:,i1), rg12(:), angle)
                 iangle = ceiling(angle)
-                mo2(iangle, idistance) = mo2(iangle, idistance) + 2d0
+                mo2(iangle, idistance) = mo2(iangle, idistance) + 1d0
+
+                call calc_angle(this_arrow(:,i2), -rg12(:), angle)
+                iangle = ceiling(angle)
+                mo2(iangle, idistance) = mo2(iangle, idistance) + 1d0
             end do
         end do
 
