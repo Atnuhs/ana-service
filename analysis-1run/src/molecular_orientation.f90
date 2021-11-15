@@ -15,6 +15,7 @@ program main
     call load_rg_and_arrow(rg, arrow, ndata, np)
     call calc_molecular_orientation(rg, arrow, mo1, mo2, np, ndata, cell)
 
+    ! output -------------------------------------------------------------------------------
     open(unit=11, file='molecular_orientation/molecular_orientation.dat', status='replace')
         do i=1,90
             write(11,*) dble(i)-0.5d0, mo1(i, :)
@@ -114,10 +115,11 @@ contains
         real(real64):: this_rg(3,np), this_arrow(3,np)
         real(real64):: rg12(3), distance
         real(real64):: angle
-        real(real64):: this_v, factor, nd
+        real(real64):: this_v, factor, nd, all_inv_v
 
         mo1(:,:) = 0
         mo2(:,:) = 0
+        ! calculate ----------------------------------------------------
         do idata=1,ndata
             this_rg(:,:) = rg(:,:,idata)
             this_arrow(:,:) = arrow(:,:,idata)
@@ -150,7 +152,7 @@ contains
             end do
         end do
 
-        ! normalize
+        ! normalize -------------------------------------------------------
         mo1(:,:) = mo1(:,:) / dble(ndata)
         mo2(:,:) = mo2(:,:) / dble(ndata)
 
@@ -165,13 +167,18 @@ contains
         end do
         
         ! 角度に対して数密度の規格化
+        all_inv_v = 0d0
         do i=1,90
             ! x軸からの角度がi-1°~i°の扇形をx軸を回転軸として回転させた時の体積
-            ! 規格化のため、半球の体積が1となるような半径を用いる
+            ! (規格化のため、半球の体積が1となるような半径を用いる)
+            ! 参考: http://ralfbalt.blog66.fc2.com/blog-entry-857.html
             this_v = cos(dble(i-1)*pi/180d0) - cos(dble(i)*pi/180d0)
+            all_inv_v = all_inv_v + 1d0 / this_v
             mo1(i,:) = mo1(i,:) / this_v
             mo2(i,:) = mo2(i,:) / this_v
         end do
 
+        mo1(:,:) = mo1(:,:) / all_inv_v
+        mo2(:,:) = mo2(:,:) / all_inv_v
     end subroutine
 end program main
