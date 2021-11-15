@@ -351,20 +351,31 @@ contains
     end subroutine
 
 
-    subroutine load_condition_for_gr_ana(ndata, rc, cell)
+    subroutine load_condition_for_gr_ana(ndata, cell)
         integer(int32),intent(out):: ndata
-        real(real64),intent(out):: rc, cell
+        real(real64),intent(out):: cell
         type(md_condition_class):: md_condition
 
         md_condition = generate_md_condition()    
         
         ndata = md_condition%nstep / md_condition%intr
-        rc = md_condition%rc
         cell = md_condition%system_cell()
     end subroutine
 
 
-    subroutine load_condition_for_molecular_orientation_ana(ndata, rc, cell)
+    subroutine load_condition_for_ext_gr_ana(ndata, cell)
+        integer(int32),intent(out):: ndata
+        real(real64),intent(out):: cell
+        type(md_condition_class):: md_condition
+
+        md_condition = generate_md_condition()    
+        
+        ndata = md_condition%nstep / md_condition%intr
+        cell = md_condition%system_cell()
+    end subroutine
+
+
+    subroutine load_condition_for_molecular_orientation_ana(ndata, cell)
         integer(int32),intent(out):: ndata
         real(real64),intent(out):: rc, cell
         type(md_condition_class):: md_condition
@@ -372,7 +383,6 @@ contains
         md_condition = generate_md_condition()    
         
         ndata = md_condition%nstep / md_condition%intr
-        rc = md_condition%rc
         cell = md_condition%system_cell()
     end subroutine
 

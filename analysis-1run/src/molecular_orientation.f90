@@ -4,10 +4,10 @@ program main
     implicit none
     integer(int32),parameter:: np=500, nlen=100
     integer(int32):: ndata, i
-    real(real64):: rc, cell, dr, max_r
+    real(real64):: cell, dr, max_r
     real(real64),allocatable:: rg(:,:,:), arrow(:,:,:), mo1(:,:), mo2(:,:)
 
-    call load_condition_for_molecular_orientation_ana(ndata, rc, cell)
+    call load_condition_for_molecular_orientation_ana(ndata, cell)
     max_r = cell / 4d0 ! 半径どこまで見るか
     dr = max_r/dble(nlen) ! 0~max_rをnlen刻み
     allocate(mo1(90,nlen), mo2(90,nlen))

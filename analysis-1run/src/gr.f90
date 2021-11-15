@@ -6,10 +6,10 @@ program main
     integer(int32):: i, ndata
     real(real64), parameter:: pi=acos(-1d0)
     real(real64):: gr(gr_len)
-    real(real64):: rc, cell, dr
+    real(real64):: cell, dr
     real(real64), allocatable:: rxyz(:,:,:)
 
-    call load_condition_for_gr_ana(ndata=ndata, rc=rc, cell=cell)
+    call load_condition_for_gr_ana(ndata=ndata, cell=cell)
     dr = rc/dble(gr_len)
     allocate(rxyz(3,np,ndata))
     gr(:) = 0d0
