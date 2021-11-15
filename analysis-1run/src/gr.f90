@@ -10,11 +10,11 @@ program main
     real(real64), allocatable:: rxyz(:,:,:)
 
     call load_condition_for_gr_ana(ndata=ndata, cell=cell)
-    dr = rc/dble(gr_len)
+    dr = cell/dble(gr_len)
     allocate(rxyz(3,np,ndata))
     gr(:) = 0d0
     call read_rxyz(rxyz, ndata, np)
-    call calc_gr(rxyz=rxyz, ndata=ndata, np=np, cell=cell, dr=dr, gr=gr)
+    call calc_gr(rxyz=rxyz, ndata=ndata, np=np, cell=cell, gr_len=gr_len, dr=dr, gr=gr)
     call normalize_gr(gr,ndata,np,cell,dr)
 
     open(unit=11,file='gr/gr.dat', status='replace')
@@ -27,10 +27,11 @@ contains
         integer(int32):: i,j,u_rxyz
 
         open(newunit=u_rxyz, file='../rxyz.dat', status='old')
-        do i=1,ndata
-            read(u_rxyz,*)
-            read(u_rxyz,*) (rxyz(:,j,i), j=1,np)
-        end do
+            do i=1,ndata
+                read(u_rxyz,*)
+                read(u_rxyz,*) (rxyz(:,j,i), j=1,np)
+            end do
+        close(u_rxyz)
     end subroutine
 
 
@@ -49,8 +50,8 @@ contains
     end subroutine
 
 
-    subroutine calc_gr(rxyz, ndata, np,cell, dr, gr)
-        integer(int32),intent(in):: ndata, np
+    subroutine calc_gr(rxyz, ndata, np, cell, gr_len, dr, gr)
+        integer(int32),intent(in):: ndata, np, gr_len
         real(real64),intent(in):: cell, dr, rxyz(:,:,:)
         real(real64),intent(inout):: gr(:)
         real(real64):: ri(3), rij(3)

@@ -377,7 +377,7 @@ contains
 
     subroutine load_condition_for_molecular_orientation_ana(ndata, cell)
         integer(int32),intent(out):: ndata
-        real(real64),intent(out):: rc, cell
+        real(real64),intent(out):: cell
         type(md_condition_class):: md_condition
 
         md_condition = generate_md_condition()    

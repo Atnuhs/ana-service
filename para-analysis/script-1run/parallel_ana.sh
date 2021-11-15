@@ -14,8 +14,9 @@ $(dirname $0)/gen_task_div.sh
 
 # 解析
 # parallel_analysis 'temp.sh'
-# parallel_analysis 'gr.sh'
-parallel_analysis 'molecular_orientation.sh'
+parallel_analysis 'gr.sh'
+parallel_analysis 'ext_gr.sh'
+# parallel_analysis 'molecular_orientation.sh'
 # parallel_analysis 'GK_thcd.sh'
 # parallel_analysis 'GK_vis.sh'
 # parallel_analysis 'thcd.sh'
