@@ -14,4 +14,6 @@ endmacro(ADDLIB)
 ###　moduleの登録
 ADDLIB(read_condition)
 ADDLIB(representative_value)
+ADDLIB(aggregate_y_data representative_value_mod)
 ADDLIB(aggregate_xy_data representative_value_mod)
+ADDLIB(aggregate_xy_ysd_data representative_value_mod)
