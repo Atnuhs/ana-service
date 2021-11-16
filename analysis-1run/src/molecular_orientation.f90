@@ -3,7 +3,7 @@ program main
     use md_condition_for_ana_mod
     implicit none
     integer(int32),parameter:: np=500, nlen=100
-    integer(int32):: ndata, i
+    integer(int32):: ndata, ix, iy
     real(real64):: cell, dr, max_r
     real(real64),allocatable:: rg(:,:,:), arrow(:,:,:), mo1(:,:), mo2(:,:)
 
@@ -17,15 +17,19 @@ program main
 
     ! output -------------------------------------------------------------------------------
     open(unit=11, file='molecular_orientation/molecular_orientation.dat', status='replace')
-        do i=1,90
-            write(11,*) dble(i)-0.5d0, mo1(i, :)
+        do ix=1,nlen
+            do iy=1,90
+                write(11,*) dble(ix-1)*dr, dble(iy)-0.5d0, mo1(iy, ix)
+            end do
         end do
     close(11)
 
 
     open(unit=12, file='molecular_orientation/molecular_orientation2.dat', status='replace')
-        do i=1,90
-            write(12,*) dble(i)-0.5d0, mo2(i, :)
+        do ix=1,nlen
+            do iy=1,90
+                write(12,*) dble(ix-1)*dr, dble(iy)-0.5d0, mo2(iy, ix)
+            end do
         end do
     close(12)
 contains

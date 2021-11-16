@@ -400,21 +400,27 @@ contains
     end subroutine
 
 
-    subroutine load_condition_for_thcd_ana(ndata, dt, vol, temp0)
+    subroutine load_condition_for_thcd_ana(ndata)
         integer(int32),intent(out):: ndata
-        real(real64),intent(out):: dt, vol, temp0
         type(md_condition_class):: md_condition
 
         md_condition = generate_md_condition()
 
         ndata = md_condition%nstep
-        dt = md_condition%dt
-        vol = md_condition%system_volume()
-        temp0 = md_condition%temp0
     end subroutine
 
 
-    subroutine load_condition_for_viscousity_ana(ndata, dt, vol)
+    subroutine load_condition_for_viscousity_ana(ndata)
+        integer(int32),intent(out):: ndata
+        type(md_condition_class):: md_condition
+
+        md_condition = generate_md_condition()
+
+        ndata = md_condition%nstep
+    end subroutine
+
+
+    subroutine load_condition_for_GK_viscousity_ana(ndata, dt, vol)
         integer(int32),intent(out):: ndata
         real(real64),intent(out):: dt, vol
         type(md_condition_class):: md_condition

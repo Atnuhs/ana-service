@@ -10,13 +10,13 @@ program main
     real(real64):: dt, tdc, temp0, temp, cell, viscousity
     real(real64), allocatable:: tdr(:,:,:)
     real(real64), allocatable:: msd(:,:,:)
-    real(real64), allocatable:: mean_msd(:), std_msd(:)
+    real(real64), allocatable:: mean_msd(:), se_msd(:)
 
     ! インプットの読み込みなどの準備
     call load_condition_for_msd_ana(ndata, dt, intd, temp0, cell)
     allocate(tdr(ndata, np, 3))
     allocate(msd(ndata, np, 3))
-    allocate(mean_msd(ndata), std_msd(ndata))
+    allocate(mean_msd(ndata), se_msd(ndata))
     call init_msd(ndata)
     call read_temp_mean(temp=temp)
     call read_viscousity(viscousity=viscousity)
@@ -24,12 +24,12 @@ program main
     ! 計算
     call read_dxyz(tdr=tdr, ndata=ndata, np=np)
     call calc_msd(msd=msd, tdr=tdr, ndata=ndata, np=np)
-    call calc_mean_msd(mean_msd=mean_msd, std_msd=std_msd, msd=msd, ndata=ndata, np=np)
+    call calc_mean_msd(mean_msd=mean_msd, se_msd=se_msd, msd=msd, ndata=ndata, np=np)
     call calc_tdc(ndata=ndata, dt=dt, intd=intd, temp=temp, temp0=temp0, &
     & cell=cell, viscousity=viscousity, mean_msd=mean_msd, tdc=tdc)
 
     ! 出力
-    call output_mean_msd(mean_msd=mean_msd, std_msd=std_msd, ndata=ndata, dt=dt, intd=intd)
+    call output_mean_msd(mean_msd=mean_msd, se_msd=se_msd, ndata=ndata, dt=dt, intd=intd)
     call output_diffusion_coefficient(tdc=tdc)
 contains
     subroutine read_temp_mean(temp)
@@ -86,20 +86,20 @@ contains
     end subroutine
 
 
-    subroutine calc_mean_msd(mean_msd, std_msd, msd, ndata, np)
+    subroutine calc_mean_msd(mean_msd, se_msd, msd, ndata, np)
         ! 各時間でのmsdの
-        real(real64),intent(out):: mean_msd(:), std_msd(:)
+        real(real64),intent(out):: mean_msd(:), se_msd(:)
         integer(int32),intent(in):: ndata, np
         real(real64),intent(in):: msd(:,:,:)
         integer(int32):: i
         real(real64),allocatable:: tmp_ar(:)
-        real(real64):: std
+        real(real64):: se
 
         allocate(tmp_ar(np))
         do i=1,ndata
             tmp_ar(:) = sum(msd(i,:,:), dim=2)
-            mean_msd(i) = mean(arr=tmp_ar, sd=std)
-            std_msd(i) = std
+            mean_msd(i) = mean(arr=tmp_ar, se=se)
+            se_msd(i) = se
         end do
     end subroutine
 
@@ -127,14 +127,14 @@ contains
     end subroutine
 
 
-    subroutine output_mean_msd(mean_msd, std_msd, ndata, dt, intd)
+    subroutine output_mean_msd(mean_msd, se_msd, ndata, dt, intd)
         character(100),parameter:: file_mean_msd='msd/mean_msd.dat'
         integer(int32),intent(in):: ndata, intd
-        real(real64),intent(in):: mean_msd(:), std_msd(:), dt
+        real(real64),intent(in):: mean_msd(:), se_msd(:), dt
         integer(int32):: u_mean_msd, i
 
         open(newunit=u_mean_msd, file=file_mean_msd, status='replace')
-            write(u_mean_msd,'(3(e13.5))')(dt*dble((i-1)*intd), mean_msd(i), std_msd(i), i=1,ndata)
+            write(u_mean_msd,'(3(e13.5))')(dt*dble((i-1)*intd), mean_msd(i), se_msd(i), i=1,ndata)
         close(u_mean_msd)
     end subroutine
 

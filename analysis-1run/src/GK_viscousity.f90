@@ -10,7 +10,7 @@ program main
     real(real64), allocatable:: integ_acf_stress(:,:)
     real(real64):: temp, dt, vol
 
-    call load_condition_for_viscousity_ana(ndata=ndata, dt=dt, vol=vol)
+    call load_condition_for_GK_viscousity_ana(ndata=ndata, dt=dt, vol=vol)
     call read_temp_mean(temp)
     allocate(stress(ndata,3))
     allocate(acf_stress(ndata,3))

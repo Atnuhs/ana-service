@@ -10,25 +10,25 @@ program main
     real(real64):: dt, rdc, temp0, temp
     real(real64), allocatable:: tdphi(:,:,:)
     real(real64), allocatable:: rmsd(:,:,:)
-    real(real64), allocatable:: mean_rmsd(:), std_rmsd(:)
+    real(real64), allocatable:: mean_rmsd(:), se_rmsd(:)
 
     ! インプットの読み込みなどの準備
     call load_condition_for_rmsd_ana(ndata, dt, intd, temp0)
     allocate(tdphi(ndata, np, 3))
     allocate(rmsd(ndata, np, 3))
-    allocate(mean_rmsd(ndata), std_rmsd(ndata))
+    allocate(mean_rmsd(ndata), se_rmsd(ndata))
     call init_msd(ndata)
     call read_temp_mean(temp=temp)
 
     ! 計算
     call read_tdphi(tdphi=tdphi, ndata=ndata, np=np)
     call calc_rmsd(rmsd=rmsd, tdphi=tdphi, ndata=ndata, np=np)
-    call calc_mean_rmsd(mean_rmsd=mean_rmsd, std_rmsd=std_rmsd, rmsd=rmsd, ndata=ndata, np=np)
+    call calc_mean_rmsd(mean_rmsd=mean_rmsd, se_rmsd=se_rmsd, rmsd=rmsd, ndata=ndata, np=np)
     call calc_rdc(ndata=ndata, dt=dt, intd=intd, temp=temp, temp0=temp0, &
     & mean_rmsd=mean_rmsd, rdc=rdc)
 
     ! 出力
-    call output_mean_rmsd(mean_rmsd=mean_rmsd, std_rmsd=std_rmsd, ndata=ndata, dt=dt, intd=intd)
+    call output_mean_rmsd(mean_rmsd=mean_rmsd, se_rmsd=se_rmsd, ndata=ndata, dt=dt, intd=intd)
     call output_diffusion_coefficient(rdc=rdc)
 contains
     subroutine read_temp_mean(temp)
@@ -82,20 +82,20 @@ contains
     end subroutine
 
 
-    subroutine calc_mean_rmsd(mean_rmsd, std_rmsd, rmsd, ndata, np)
+    subroutine calc_mean_rmsd(mean_rmsd, se_rmsd, rmsd, ndata, np)
         ! 各時間でのmsdの
-        real(real64),intent(out):: mean_rmsd(:), std_rmsd(:)
+        real(real64),intent(out):: mean_rmsd(:), se_rmsd(:)
         integer(int32),intent(in):: ndata, np
         real(real64),intent(in):: rmsd(:,:,:)
         integer(int32):: i
         real(real64),allocatable:: tmp_ar(:)
-        real(real64):: std
+        real(real64):: se
 
         allocate(tmp_ar(np))
         do i=1,ndata
             tmp_ar(:) = sum(rmsd(i,:,:), dim=2)
-            mean_rmsd(i) = mean(arr=tmp_ar, sd=std)
-            std_rmsd(i) = std
+            mean_rmsd(i) = mean(arr=tmp_ar, se=se)
+            se_rmsd(i) = se
         end do
     end subroutine
 
@@ -122,14 +122,14 @@ contains
     end subroutine
 
 
-    subroutine output_mean_rmsd(mean_rmsd, std_rmsd, ndata, dt, intd)
+    subroutine output_mean_rmsd(mean_rmsd, se_rmsd, ndata, dt, intd)
         character(100),parameter:: file_mean_msd='rmsd/mean_rmsd.dat'
         integer(int32),intent(in):: ndata, intd
-        real(real64),intent(in):: mean_rmsd(:), std_rmsd(:), dt
+        real(real64),intent(in):: mean_rmsd(:), se_rmsd(:), dt
         integer(int32):: u_mean_msd, i
 
         open(newunit=u_mean_msd, file=file_mean_msd, status='replace')
-            write(u_mean_msd,'(3(e13.5))')(dt*dble((i-1)*intd), mean_rmsd(i), std_rmsd(i), i=1,ndata)
+            write(u_mean_msd,'(3(e13.5))')(dt*dble((i-1)*intd), mean_rmsd(i), se_rmsd(i), i=1,ndata)
         close(u_mean_msd)
     end subroutine
 
