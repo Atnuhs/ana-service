@@ -14,7 +14,8 @@ macro(ADDEXE name)
 endmacro(ADDEXE)
 
 ### テストディレクトリの追加
-ADDEXE(gr read_condition_mod representative_value_mod)
+ADDEXE(gr aggregate_xy_data_mod)
+ADDEXE(ext_gr aggregate_xy_data_mod)
 ADDEXE(molecular_orientation read_condition_mod representative_value_mod)
 ADDEXE(msd read_condition_mod representative_value_mod)
 ADDEXE(rmsd read_condition_mod representative_value_mod)

@@ -6,5 +6,6 @@ program main
     integer(int32):: fst_run, lst_run
 
     read*, fst_run, lst_run
-    call aggregate_xy_data('gr/gr', fst_run, lst_run, gr_len)
+    call aggregate_xy_data('ext_gr/gr_gp', fst_run, lst_run, gr_len)
+    call aggregate_xy_data('ext_gr/gr_pp', fst_run, lst_run, gr_len)
 end program main
