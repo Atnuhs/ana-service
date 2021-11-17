@@ -1,16 +1,16 @@
 program main
     use,intrinsic :: iso_fortran_env
     use read_condition_mod
-    use aggregate_y_data_mod
-    use aggregate_xy_ysd_data_mod
+    use aggregate_x_mod
+    use aggregate_x_y_mod
     implicit none
     integer(int32):: ndata
     integer(int32):: fst_run, lst_run
 
     read*, fst_run, lst_run
     call input_condition(ndata)
-    call aggregate_y_data('msd/translational_diffusion_coefficient', fst_run, lst_run)
-    call aggregate_xy_ysd_data('msd/mean_msd', fst_run, lst_run, ndata)
+    call aggregate_x('msd/translational_diffusion_coefficient', fst_run, lst_run)
+    call aggregate_x_y_ysd('msd/msd_mean', fst_run, lst_run, ndata)
 contains
     subroutine input_condition(ndata)
         integer(int32),intent(out):: ndata

@@ -5,6 +5,7 @@ program main
     integer(int32), parameter:: np=500, gr_len=1000
     real(real64), parameter:: pi=acos(-1d0)
     integer(int32):: i, ndata
+    
     real(real64):: gr_gp(gr_len), gr_pp(gr_len)
     real(real64):: cell, dr
     real(real64), allocatable:: rg(:,:,:), rp1(:,:,:), rp2(:,:,:)

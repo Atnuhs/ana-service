@@ -8,18 +8,18 @@ program main
     call generate_thcd_from_gk_thcd()
 contains
     subroutine generate_thcd_from_run_thcd(fst_run, lst_run)
-        use aggregate_y_ysd_data_mod
+        use aggregate_x_mod
         integer(int32),intent(in):: fst_run, lst_run
         
-        call aggregate_y_ysd_data('thcd/thcd', fst_run, lst_run)
+        call aggregate_x_xsd('thcd/thcd', fst_run, lst_run)
     end subroutine
 
 
     subroutine generate_thcd_from_gk_thcd()
         use convergence_green_kubo_formula_mod
-        character(100),parameter:: file_integ = 'GK_thcd/integ_ej_mean.txt'
-        character(100),parameter:: file_conv = 'thcd/thcd_ej_mean.txt'
-        character(100),parameter:: file_integ_lim = 'thcd/integ_ej_mean_lm.txt'
+        character(100),parameter:: file_integ = 'GK_thcd/integ_acf_ej_mean.txt'
+        character(100),parameter:: file_conv = 'thcd/thcd_acf_ej_mean.txt'
+        character(100),parameter:: file_integ_lim = 'thcd/integ_acf_ej_mean_lm.txt'
         integer(int32),parameter:: fst_calc=3000, lst_calc=6000
         integer(int32):: ndata
         call input_condition(ndata)

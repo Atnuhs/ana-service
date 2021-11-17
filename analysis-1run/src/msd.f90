@@ -10,13 +10,13 @@ program main
     real(real64):: dt, tdc, temp0, temp, cell, viscousity
     real(real64), allocatable:: tdr(:,:,:)
     real(real64), allocatable:: msd(:,:,:)
-    real(real64), allocatable:: mean_msd(:), se_msd(:)
+    real(real64), allocatable:: msd_mean(:), msd_se(:)
 
     ! インプットの読み込みなどの準備
     call load_condition_for_msd_ana(ndata, dt, intd, temp0, cell)
     allocate(tdr(ndata, np, 3))
     allocate(msd(ndata, np, 3))
-    allocate(mean_msd(ndata), se_msd(ndata))
+    allocate(msd_mean(ndata), msd_se(ndata))
     call init_msd(ndata)
     call read_temp_mean(temp=temp)
     call read_viscousity(viscousity=viscousity)
@@ -24,12 +24,12 @@ program main
     ! 計算
     call read_dxyz(tdr=tdr, ndata=ndata, np=np)
     call calc_msd(msd=msd, tdr=tdr, ndata=ndata, np=np)
-    call calc_mean_msd(mean_msd=mean_msd, se_msd=se_msd, msd=msd, ndata=ndata, np=np)
+    call calc_msd_mean(msd_mean=msd_mean, msd_se=msd_se, msd=msd, ndata=ndata, np=np)
     call calc_tdc(ndata=ndata, dt=dt, intd=intd, temp=temp, temp0=temp0, &
-    & cell=cell, viscousity=viscousity, mean_msd=mean_msd, tdc=tdc)
+    & cell=cell, viscousity=viscousity, msd_mean=msd_mean, tdc=tdc)
 
     ! 出力
-    call output_mean_msd(mean_msd=mean_msd, se_msd=se_msd, ndata=ndata, dt=dt, intd=intd)
+    call output_msd_mean(msd_mean=msd_mean, msd_se=msd_se, ndata=ndata, dt=dt, intd=intd)
     call output_diffusion_coefficient(tdc=tdc)
 contains
     subroutine read_temp_mean(temp)
@@ -86,9 +86,9 @@ contains
     end subroutine
 
 
-    subroutine calc_mean_msd(mean_msd, se_msd, msd, ndata, np)
+    subroutine calc_msd_mean(msd_mean, msd_se, msd, ndata, np)
         ! 各時間でのmsdの
-        real(real64),intent(out):: mean_msd(:), se_msd(:)
+        real(real64),intent(out):: msd_mean(:), msd_se(:)
         integer(int32),intent(in):: ndata, np
         real(real64),intent(in):: msd(:,:,:)
         integer(int32):: i
@@ -98,20 +98,20 @@ contains
         allocate(tmp_ar(np))
         do i=1,ndata
             tmp_ar(:) = sum(msd(i,:,:), dim=2)
-            mean_msd(i) = mean(arr=tmp_ar, se=se)
-            se_msd(i) = se
+            msd_mean(i) = mean(arr=tmp_ar, se=se)
+            msd_se(i) = se
         end do
     end subroutine
 
 
-    subroutine calc_tdc(ndata, dt, intd, temp, temp0, cell, viscousity, mean_msd, tdc)
+    subroutine calc_tdc(ndata, dt, intd, temp, temp0, cell, viscousity, msd_mean, tdc)
         real(real64),parameter:: kb = 1.38064852e-23
         real(real64),parameter:: pi = acos(-1d0)
         real(real64),parameter:: zeta = 2.837297d0
 
         real(real64),intent(out):: tdc
         integer(int32),intent(in):: ndata, intd
-        real(real64),intent(in):: mean_msd(ndata), dt, temp0, temp, cell, viscousity
+        real(real64),intent(in):: msd_mean(ndata), dt, temp0, temp, cell, viscousity
 
         integer(int32):: l,r,n,i
         real(real64):: a, x(ndata), tdc_pbc, tdc_temp
@@ -120,22 +120,22 @@ contains
         l = ndata/10
         r = ndata/4
         n = r-l+1
-        call least_squares_method(n=n, x=x(l:r), y=mean_msd(l:r), a=a)
+        call least_squares_method(n=n, x=x(l:r), y=msd_mean(l:r), a=a)
         tdc_pbc = a / 6d0
         tdc_temp = tdc_pbc + (kb*temp*zeta)/(6d0*pi*cell*viscousity) ! セルサイズ補正
         tdc = tdc_temp * (temp0/temp) ! 温度補正
     end subroutine
 
 
-    subroutine output_mean_msd(mean_msd, se_msd, ndata, dt, intd)
-        character(100),parameter:: file_mean_msd='msd/mean_msd.dat'
+    subroutine output_msd_mean(msd_mean, msd_se, ndata, dt, intd)
+        character(100),parameter:: file_msd_mean='msd/msd_mean.dat'
         integer(int32),intent(in):: ndata, intd
-        real(real64),intent(in):: mean_msd(:), se_msd(:), dt
-        integer(int32):: u_mean_msd, i
+        real(real64),intent(in):: msd_mean(:), msd_se(:), dt
+        integer(int32):: u_msd_mean, i
 
-        open(newunit=u_mean_msd, file=file_mean_msd, status='replace')
-            write(u_mean_msd,'(3(e13.5))')(dt*dble((i-1)*intd), mean_msd(i), se_msd(i), i=1,ndata)
-        close(u_mean_msd)
+        open(newunit=u_msd_mean, file=file_msd_mean, status='replace')
+            write(u_msd_mean,'(3(e13.5))')(dt*dble((i-1)*intd), msd_mean(i), msd_se(i), i=1,ndata)
+        close(u_msd_mean)
     end subroutine
 
 

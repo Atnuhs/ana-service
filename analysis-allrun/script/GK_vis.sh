@@ -12,5 +12,5 @@ readonly FILE_EXE=$(file_exe GK_viscousity.out)
 ana_allrun "${FILE_EXE}" "${DIR_OUTPUT}" "${FST_RUN}" "${LST_RUN}"
 
 
-cat "${DIR_OUTPUT}/integ_stress_mean.txt" | split_file '100' > "${DIR_OUTPUT}/integ_stress_mean_sp.txt" 
-cat "${DIR_OUTPUT}/integ_stress_all.txt" | split_file '100' > "${DIR_OUTPUT}/integ_stress_all_sp.txt" 
+cat "${DIR_OUTPUT}/integ_acf_stress_mean.txt" | split_file '100' > "${DIR_OUTPUT}/integ_acf_stress_mean_sp.txt" 
+cat "${DIR_OUTPUT}/integ_acf_stress_all.txt" | split_file '100' > "${DIR_OUTPUT}/integ_acf_stress_all_sp.txt" 

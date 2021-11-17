@@ -5,12 +5,13 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 # 解析のやる/やらない、は、コメントアウトで調節する。
 
 # 準備
+# $(dirname $0)/../../analysis-1run/script/clean.sh
 $(dirname $0)/../../analysis-1run/script/build.sh
 $(dirname $0)/gen_task_all.sh
 $(dirname $0)/gen_task_div.sh
 
 # 解析の削除
-# clean_analysis [!注意!] taskのAnalysisを全部消す
+# clean_analysis # [!注意!] taskのAnalysisを全部消す
 
 # 解析
 # parallel_analysis 'temp.sh'
@@ -19,7 +20,7 @@ $(dirname $0)/gen_task_div.sh
 # parallel_analysis 'molecular_orientation.sh'
 # parallel_analysis 'GK_thcd.sh'
 # parallel_analysis 'GK_vis.sh'
-parallel_analysis 'thcd.sh'
+# parallel_analysis 'thcd.sh'
 # parallel_analysis 'vis.sh'
 # parallel_analysis 'msd.sh'
-# parallel_analysis 'rmsd.sh'
+parallel_analysis 'rmsd.sh'
