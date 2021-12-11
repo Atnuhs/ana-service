@@ -12,5 +12,5 @@ cd "${DIR_BUILD}"
 
 cmake .. \
 -DCMAKE_Fortran_COMPILER="${DIR_FORTRAN_COMPILER}" \
--DCMAKE_BUILD_TYPE=debug
+-DCMAKE_BUILD_TYPE=release
 make

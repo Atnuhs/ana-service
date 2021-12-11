@@ -16,6 +16,14 @@ ana () {
     local filename_exe=$1 dirname_output=$2
     local -r file_exe="${DIR_EXE}/${filename_exe}"
     local -r dir_output="${DIR_WDIR}/${dirname_output}"
+
+    rm -r "${dir_output}"
     mkdir -p "${dir_output}"
     "${file_exe}"
+
+    if [ -f './gmon.out' ];  then
+        gprof "${file_exe}" './gmon.out' > "${dir_output}/gmon.log"
+        echo "プロファイル結果 => ${dir_output}/gmon.log"
+        rm './gmon.out'
+    fi
 }
