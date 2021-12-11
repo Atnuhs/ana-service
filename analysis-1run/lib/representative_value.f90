@@ -23,6 +23,7 @@ contains
 
 
     subroutine least_squares_method(n,x,y,a,b)
+        ! 最小二乗法
         integer(int32),intent(in):: n
         real(prec),intent(in):: x(n),y(n)
         real(prec),optional,intent(out):: a,b

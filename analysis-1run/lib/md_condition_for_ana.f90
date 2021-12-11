@@ -233,11 +233,11 @@ end module
 
 module md_condition_mod
     use,intrinsic :: iso_fortran_env
+    use const_mod
     use rate_mod
     use condition_input_mod
     use rate_input_mod
     use molecular_input_mod
-    real(real64),parameter:: an=6.0221367d+23
     type md_condition_class
         integer(int32):: np = 500
         integer(int32):: nstep

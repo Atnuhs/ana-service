@@ -4,7 +4,6 @@ program main
     implicit none
     integer(int32), parameter:: np=500, gr_len=1000
     integer(int32):: i, ndata
-    real(real64), parameter:: pi=acos(-1d0)
     real(real64):: gr(gr_len)
     real(real64):: cell, dr
     real(real64), allocatable:: rxyz(:,:,:)

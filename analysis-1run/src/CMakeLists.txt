@@ -15,7 +15,7 @@ endmacro(ADDEXE)
 
 ### テストディレクトリの追加
 ADDEXE(gr                    md_condition_for_ana_mod)
-ADDEXE(ext_gr                md_condition_for_ana_mod)
+ADDEXE(ext_gr                ext_gr_calculation_mod)
 ADDEXE(molecular_orientation md_condition_for_ana_mod)
 ADDEXE(temp                  md_condition_for_ana_mod representative_value_mod)
 ADDEXE(msd                   md_condition_for_ana_mod fft_mod mean_square_displacement_mod representative_value_mod)
