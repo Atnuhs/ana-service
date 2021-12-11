@@ -144,23 +144,7 @@ end module
 
 
 
-module read_md_result
-    use,intrinsic :: iso_fortran_env
-    implicit none
-contains
-    subroutine read_sxyz(np, ndata, sxyz)
-        integer(int32), intent(in):: np, ndata
-        real(real64),intent(out):: sxyz(3,3,np,ndata)
-        integer(int32):: i, j, k, u_sxyz
 
-        open (newunit=u_sxyz, file='../sxyz.dat', status='old')
-            do i=1,ndata
-                read(u_sxyz, *)
-                read(u_sxyz, *) ((sxyz(:,k,j,i), k=1,3), j=1,np)
-            end do
-        close(u_sxyz)
-    end subroutine
-end module read_md_result
 
 
 
@@ -172,7 +156,6 @@ module io_file_mod
     use io_arx_ary_data_mod
     use io_arx_ary_arysd_data_mod
     use io_arx_ary_arz_data_mod
-    use read_md_result
     implicit none
 contains
     function rundir(run)
