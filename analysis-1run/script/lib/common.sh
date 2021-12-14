@@ -17,7 +17,7 @@ ana () {
     local -r file_exe="${DIR_EXE}/${filename_exe}"
     local -r dir_output="${DIR_WDIR}/${dirname_output}"
 
-    rm -r "${dir_output}"
+    [ -d "${dir_output}" ] && rm -r "${dir_output}"
     mkdir -p "${dir_output}"
     "${file_exe}"
 
