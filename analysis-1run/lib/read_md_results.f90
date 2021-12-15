@@ -4,8 +4,9 @@ module read_md_results_mod
     character(100),parameter:: file_sxyz='../sxyz.dat'
     character(100),parameter:: file_tdc='../tdc.dat'
     character(100),parameter:: file_stress='../stress.dat'
+    character(100),parameter:: file_rxyz='../rxyz.dat'
 
-    integer(int32):: u_sxyz, u_tdc, u_stress
+    integer(int32):: u_sxyz, u_tdc, u_stress, u_rxyz
 contains
     subroutine open_sxyz()
         open (newunit=u_sxyz, file=file_sxyz, status='old')
@@ -15,15 +16,36 @@ contains
         close(u_sxyz)
     end subroutine
 
-    subroutine read_sxyz(read_len, sxyz)
-        integer(int32), intent(in)::read_len
+    subroutine read_sxyz(len_readlines, sxyz)
+        integer(int32), intent(in)::len_readlines
         real(real64),intent(out):: sxyz(:,:,:,:)
         integer(int32):: i, j, k, np
 
         np = size(sxyz, 3)
-        do i=1,read_len
+        do i=1,len_readlines
             read(u_sxyz, *)
             read(u_sxyz, *) ((sxyz(:,k,j,i), k=1,3), j=1,np)
+        end do
+    end subroutine
+
+
+    subroutine open_rxyz()
+        open (newunit=u_rxyz, file=file_rxyz, status='old')
+    end subroutine
+
+    subroutine close_rxyz()
+        close(u_rxyz)
+    end subroutine
+
+    subroutine read_rxyz(len_readlines, rxyz)
+        integer(int32), intent(in)::len_readlines
+        real(real64),intent(out):: rxyz(:,:,:)
+        integer(int32):: i, j, np
+
+        np = size(rxyz, 2)
+        do i=1,len_readlines
+            read(u_rxyz, *)
+            read(u_rxyz, *) (rxyz(:,j,i), j=1,np)
         end do
     end subroutine
 

@@ -53,7 +53,7 @@ contains
     end subroutine
 
     subroutine load_rg_and_rp12()
-        call read_sxyz(read_len=n_read_row, sxyz=sxyz)
+        call read_sxyz(len_readlines=n_read_row, sxyz=sxyz)
         rg(:,:,:) = sxyz(:,3,:,:)
         rp1(:,:,:) = sxyz(:,1,:,:)
         rp2(:,:,:) = sxyz(:,2,:,:)

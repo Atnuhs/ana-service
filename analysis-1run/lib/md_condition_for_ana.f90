@@ -460,4 +460,13 @@ contains
         intd = md_condition%intd
         temp0 = md_condition%temp0
     end subroutine
+
+    subroutine load_condition_for_transpose_rxyz(ndata, np)
+        integer(int32),intent(out):: ndata, np
+        type(md_condition_class):: md_condition
+
+        md_condition = generate_md_condition()
+        ndata = md_condition%nstep / md_condition%intd
+        np = md_condition%np
+    end subroutine
 end module

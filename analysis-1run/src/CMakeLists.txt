@@ -14,6 +14,7 @@ macro(ADDEXE name)
 endmacro(ADDEXE)
 
 ### テストディレクトリの追加
+ADDEXE(transpose_rxyz        md_condition_for_ana_mod read_md_results_mod)
 ADDEXE(gr                    md_condition_for_ana_mod)
 ADDEXE(ext_gr                md_condition_for_ana_mod io_file_mod read_md_results_mod)
 ADDEXE(molecular_orientation md_condition_for_ana_mod)
