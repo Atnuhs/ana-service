@@ -16,6 +16,7 @@ endmacro(ADDEXE)
 ### テストディレクトリの追加
 ADDEXE(gr                    aggregate_x_y_mod)
 ADDEXE(ext_gr                aggregate_x_y_mod)
+ADDEXE(3dgr_peak)
 ADDEXE(molecular_orientation aggregate_x_y_z_mod)
 ADDEXE(msd  read_condition_mod aggregate_x_y_mod aggregate_x_mod)
 ADDEXE(rmsd read_condition_mod aggregate_x_y_mod aggregate_x_mod)
