@@ -54,9 +54,16 @@ program main
 contains
     subroutine search_peaks()
         integer(int32):: ix, iy
+        logical:: is_peak
+
         do iy=1,len_y
-            do ix=2,len_x-1
-                if (z(ix-1,iy) < z(ix,iy) .and. z(ix+1,iy) < z(ix,iy)) then
+            do ix=1,len_x
+                is_peak = .true.
+                if (ix > 1) is_peak = is_peak .and. z(ix-1,iy) < z(ix,iy)
+                if (ix < len_x) is_peak = is_peak .and. z(ix+1,iy) < z(ix,iy)
+                if (iy > 1) is_peak = is_peak .and. z(ix,iy-1) < z(ix,iy)
+                if (iy < len_y) is_peak = is_peak .and. z(ix,iy+1) < z(ix,iy)
+                if (is_peak) then
                     ! peak発見
                     ipeaks(iy) = ipeaks(iy) + 1
                     if (ipeaks(iy) <= lim_peak) then
