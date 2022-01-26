@@ -58,11 +58,14 @@ contains
 
         hcell = cell * 0.5d0
 
-        where(vec > hcell)
-            vec=vec-cell
-        else where(vec < -hcell)
-            vec=vec+cell
-        end where
+        if (vec(1) > hcell) vec(1)=vec(1)-cell
+        if (vec(1) < -hcell) vec(1)=vec(1)+cell
+
+        if (vec(2) > hcell) vec(2)=vec(2)-cell
+        if (vec(2) < -hcell) vec(2)=vec(2)+cell
+
+        if (vec(3) > hcell) vec(3)=vec(3)-cell
+        if (vec(3) < -hcell) vec(3)=vec(3)+cell
     end subroutine
 
 
