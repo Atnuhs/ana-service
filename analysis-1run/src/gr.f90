@@ -8,19 +8,19 @@ program main
     real(real64):: cell, dr
     real(real64), allocatable:: rxyz(:,:,:)
 
-    call load_condition_for_gr_ana(ndata=ndata, cell=cell)
+    call load_condition_for_gr_ana(ndata, cell)
     dr = cell/dble(gr_len)
     allocate(rxyz(3,np,ndata))
     gr(:) = 0d0
     call read_rxyz(rxyz, ndata, np)
-    call calc_gr(rxyz=rxyz, ndata=ndata, np=np, cell=cell, gr_len=gr_len, dr=dr, gr=gr)
+    call calc_gr(rxyz, ndata, np, cell, gr_len, dr, gr)
     call normalize_gr(gr,ndata,np,cell,dr)
 
     open(unit=11,file='gr/gr.dat', status='replace')
         write(11,'(2e14.5)') (i*dr, gr(i), i=1,gr_len)
     close(11)
 contains
-    subroutine read_rxyz(rxyz,ndata,np)
+    subroutine read_rxyz(rxyz, ndata, np)
         real(real64),intent(out):: rxyz(:,:,:)
         integer(int32),intent(in):: ndata,np
         integer(int32):: i,j,u_rxyz
@@ -70,7 +70,7 @@ contains
     end subroutine
 
 
-    subroutine normalize_gr(gr,ndata,np,cell,dr)
+    subroutine normalize_gr(gr, ndata, np, cell, dr)
         real(real64), parameter:: pi = acos(-1d0) 
         real(real64), intent(in):: cell, dr
         real(real64), intent(inout):: gr(:)

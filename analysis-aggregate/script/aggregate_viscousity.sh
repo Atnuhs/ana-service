@@ -13,13 +13,13 @@ do
     while read task
     do
         dir_analysis="${task}/Analysis"
-        file_viscousity="${dir_analysis}/viscousity/viscousity.txt"
+        file_viscousity="${dir_analysis}/viscousity/viscousity_mean.txt"
         file_temp="${dir_analysis}/temp/temp_mean.txt"
         # TODO　別の参照方法を考える
         rate="${task##*/}"
         temp=$(sed -n 1P ${file_temp} | awk '{print $2}')
-        viscousity=$(sed -n 2P ${file_viscousity} | awk '{print $1}')
-        viscousity_se=$(sed -n 2P ${file_viscousity} | awk '{print $2}')
+        viscousity=$(sed -n 1P ${file_viscousity} | awk '{print $1}')
+        viscousity_se=$(sed -n 1P ${file_viscousity} | awk '{print $2}')
         echo -e "${task}\t${rate}\t${viscousity}\t${viscousity_se}\t${temp}"
 
     done < "${file_project_paths}"

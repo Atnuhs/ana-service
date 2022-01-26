@@ -13,13 +13,13 @@ do
     while read task
     do
         dir_analysis="${task}/Analysis"
-        file_thcd="${dir_analysis}/thcd/thcd.txt"
+        file_thcd="${dir_analysis}/thcd/thcd_mean.txt"
         file_temp="${dir_analysis}/temp/temp_mean.txt"
         # TODO　別の参照方法を考える
         rate="${task##*/}"
         temp=$(sed -n 1P ${file_temp} | awk '{print $2}')
-        thcd=$(sed -n 2P ${file_thcd} | awk '{print $1}')
-        thcd_se=$(sed -n 2P ${file_thcd} | awk '{print $2}')
+        thcd=$(sed -n 1P ${file_thcd} | awk '{print $1}')
+        thcd_se=$(sed -n 1P ${file_thcd} | awk '{print $2}')
         echo -e "${task}\t${rate}\t${thcd}\t${thcd_se}\t${temp}"
 
     done < "${file_project_paths}"

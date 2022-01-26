@@ -13,13 +13,13 @@ $(dirname $0)/make_task_div.sh
 # clean_analysis # [!注意!] taskのAnalysisを全部消す
 
 # 解析
-# parallel_analysis 'temp.sh'
-# parallel_analysis 'gr.sh'
+parallel_analysis 'temp.sh'
+parallel_analysis 'gr.sh'
 # parallel_analysis 'ext_gr.sh'
-parallel_analysis 'molecular_orientation.sh'
-# parallel_analysis 'GK_thcd.sh'
-# parallel_analysis 'thcd.sh'
-# parallel_analysis 'GK_vis.sh'
-# parallel_analysis 'vis.sh'
-# parallel_analysis 'msd.sh'
-# parallel_analysis 'rmsd.sh'
+# parallel_analysis 'molecular_orientation.sh'
+parallel_analysis 'GK_thcd.sh'
+parallel_analysis 'thcd.sh'
+parallel_analysis 'GK_vis.sh'
+parallel_analysis 'vis.sh'
+parallel_analysis 'msd.sh'
+parallel_analysis 'rmsd.sh'
