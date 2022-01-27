@@ -19,7 +19,7 @@ TMPDIR=$(ssh -n "${HOSTNAME_REMOTE}" "mktemp -d")
 }
 
 : 解析 | {
-    ssh -n "${HOSTNAME_REMOTE}" "cd ${TMPDIR}/${SUBDIR_RUN}; mkdir Analysis; cd Analysis; ls ../../../; /home/user0/abe/analysis-1run/script/${FILENAME_ANALYSIS}"
+    ssh -n "${HOSTNAME_REMOTE}" "cd ${TMPDIR}/${SUBDIR_RUN}; mkdir -p Analysis; cd Analysis; ls ../../../; /home/user0/abe/analysis-1run/script/${FILENAME_ANALYSIS}"
 }
 
 ssh -n "${HOSTNAME_REMOTE}" "rm -rf ${TMPDIR}"
