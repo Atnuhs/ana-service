@@ -10,14 +10,14 @@ file_project_paths () {
 }
 
 
-while read filename_project_struct fst_run lst_run
+while read -r filename_project_struct fst_run lst_run
 do
-    while read task
+    while read -r task
     do
         for run in $(seq -f "%02g" "${fst_run}" "${lst_run}")
         do
             dir_analysis="${task}/calculation/run${run}/Analysis"
-            echo $dir_analysis
+            echo "$dir_analysis"
         done
-    done < "$(file_project_paths ${filename_project_struct})"
+    done < "$(file_project_paths "${filename_project_struct}")"
 done < <(tail -n +2 "${FILE_TASK_SETTING}") | tee "${FILE_TASK_ALL}"

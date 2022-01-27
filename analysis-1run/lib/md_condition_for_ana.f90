@@ -292,8 +292,8 @@ contains
         md_condition = generate_md_condition(condition_input, molecular_input, rate)
         md_condition_reference = generate_md_condition(condition_input, molecular_input, rate_reference)
 
-        call md_condition%print()
-        call compare_with_reference_condition(md_condition, md_condition_reference)
+        ! call md_condition%print()
+        ! call compare_with_reference_condition(md_condition, md_condition_reference)
     end function
 
 
