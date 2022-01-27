@@ -10,6 +10,5 @@ readonly DIR_TARGET_CALC="$2"
 echo "${DIR_ROOT}"
 TMPDIR=$(ssh -n "${HOSTNAME_REMOTE}" "mktemp -d")
 
-readonly DIR_REMOTE_CALC="${TMPDIR}/${DIR_TARGET_CALC}"
-rsync -ahvz "${DIR_TARGET_CALC}" "${HOSTNAME_REMOTE}:${DIR_REMOTE_CALC}"
+rsync -ahvz "${DIR_TARGET_CALC}" "${HOSTNAME_REMOTE}:${TMPDIR}"
 
