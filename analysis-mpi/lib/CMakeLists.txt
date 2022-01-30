@@ -11,5 +11,7 @@ macro(ADDLIB name)
 endmacro(ADDLIB)
 
 
-###　moduleの登録
+### moduleの登録
 ADDLIB(io_file)
+ADDLIB(const)
+ADDLIB(md_condition_for_ana const_mod)

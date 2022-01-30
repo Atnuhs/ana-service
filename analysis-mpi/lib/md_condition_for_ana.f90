@@ -238,9 +238,9 @@ module md_condition_mod
     use rate_input_mod
     use molecular_input_mod
     implicit none
-    character(100),parameter:: file_condition_input = '../../../input/condition_input.txt'
-    character(100),parameter:: file_molecular_input = '../../../input/molecular_input.txt'
-    character(100),parameter:: file_rate_input = '../../../input/rate_input.txt'
+    character(100),parameter:: file_condition_input = '../input/condition_input.txt'
+    character(100),parameter:: file_molecular_input = '../input/molecular_input.txt'
+    character(100),parameter:: file_rate_input = '../input/rate_input.txt'
     type md_condition_class
         integer(int32):: np = 500
         integer(int32):: nstep
@@ -292,8 +292,8 @@ contains
         md_condition = generate_md_condition(condition_input, molecular_input, rate)
         md_condition_reference = generate_md_condition(condition_input, molecular_input, rate_reference)
 
-        ! call md_condition%print()
-        ! call compare_with_reference_condition(md_condition, md_condition_reference)
+        call md_condition%print()
+        call compare_with_reference_condition(md_condition, md_condition_reference)
     end function
 
 
@@ -453,14 +453,15 @@ contains
     end subroutine
 
 
-    subroutine load_condition_for_gr_ana(ndata, cell)
-        integer(int32),intent(out):: ndata
+    subroutine load_condition_for_gr_ana(ndata, np, cell)
+        integer(int32),intent(out):: ndata, np
         real(real64),intent(out):: cell
         type(md_condition_class):: md_condition
 
         md_condition = md_condition_class() 
         
         ndata = md_condition%nstep / md_condition%intr
+        np = md_condition%np
         cell = md_condition%system_cell()
     end subroutine
 

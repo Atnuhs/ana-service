@@ -17,5 +17,6 @@ macro(ADDEXE name)
 endmacro(ADDEXE)
 
 ### テストディレクトリの追加
-ADDEXE(test io_file_mod)
+ADDEXE(gr io_file_mod md_condition_for_ana_mod)
+ADDEXE(temp io_file_mod md_condition_for_ana_mod)
 
