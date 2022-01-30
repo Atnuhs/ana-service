@@ -1,6 +1,6 @@
 #!/bin/bash
-set -euo pipefail
-trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
+# set -euo pipefail
+# trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 . "$(dirname $0)/lib/common_1run.sh"
 # 解析のやる/やらない、は、コメントアウトで調節する。
 
@@ -15,7 +15,7 @@ $(dirname $0)/gen_task_div.sh
 
 # 解析
 parallel_analysis 'temp.sh'
-parallel_analysis 'gr.sh'
+# parallel_analysis 'gr.sh'
 # parallel_analysis 'ext_gr.sh'
 # parallel_analysis 'molecular_orientation.sh'
 parallel_analysis 'GK_thcd.sh'
@@ -23,4 +23,4 @@ parallel_analysis 'GK_vis.sh'
 parallel_analysis 'thcd.sh'
 parallel_analysis 'vis.sh'
 parallel_analysis 'msd.sh'
-# parallel_analysis 'rmsd.sh'
+parallel_analysis 'rmsd.sh'
