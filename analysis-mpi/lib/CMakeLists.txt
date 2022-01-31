@@ -14,4 +14,8 @@ endmacro(ADDLIB)
 ### moduleの登録
 ADDLIB(io_file)
 ADDLIB(const)
+ADDLIB(fft)
+ADDLIB(numerical_integration)
 ADDLIB(md_condition_for_ana const_mod)
+ADDLIB(representative_value)
+ADDLIB(mean_square_displacement fft_mod)

@@ -43,7 +43,7 @@ contains
         ! 計算
         do i=fst_run+rank, lst_run, procs
             print*, 'reading ... ', '../calculation/'//rundir(i)//'/rxyz.dat', rank
-            call read_rxyz('../calculation/'//rundir(i)//'/rxyz.dat', rxyz, ndata, np)
+            call read_rxyz('../calculation/'//rundir(i)//'/rxyz.dat', ndata, np, rxyz)
             call calc_gr(rxyz, ndata, np, cell, gr_len, dr, gr_local)
         end do
         call normalize_gr(gr_local, ndata, np, all_run, cell, dr)
@@ -52,7 +52,7 @@ contains
         call mpi_reduce(gr_local, gr_global, gr_len,mpi_double_precision, mpi_sum, 0, mpi_comm_world, ierr)
         if (rank==0) then
             x(:) = [(i*dr, i=1,gr_len)]
-            call write_x_y(gr_len, './gr/gr_mean.txt', x, gr_global)
+            call write_arx_ary('./gr/gr_mean.txt', gr_len, x, gr_global)
         end if
     end subroutine
 

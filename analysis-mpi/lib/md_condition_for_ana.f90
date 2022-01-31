@@ -443,6 +443,7 @@ end module
 
 module md_condition_for_ana_mod
     use md_condition_mod
+    implicit none
 contains 
     subroutine load_condition_for_temp_ana(ndata)
         integer(int32),intent(out):: ndata
@@ -536,14 +537,15 @@ contains
     end subroutine
 
 
-    subroutine load_condition_for_msd_ana(ndata, dt, intd, temp0, cell)
-        integer(int32),intent(out):: ndata, intd
+    subroutine load_condition_for_msd_ana(ndata, np, dt, intd, temp0, cell)
+        integer(int32),intent(out):: ndata, np, intd
         real(real64),intent(out):: dt, temp0, cell
         type(md_condition_class):: md_condition
 
         md_condition = md_condition_class()
 
         ndata = md_condition%nstep / md_condition%intd
+        np = md_condition%np
         dt = md_condition%dt
         intd = md_condition%intd
         temp0 = md_condition%temp0
@@ -551,14 +553,15 @@ contains
     end subroutine
 
 
-    subroutine load_condition_for_rmsd_ana(ndata, dt, intd, temp0)
-        integer(int32),intent(out):: ndata, intd
+    subroutine load_condition_for_rmsd_ana(ndata, np, dt, intd, temp0)
+        integer(int32),intent(out):: ndata, np, intd
         real(real64),intent(out):: dt, temp0
         type(md_condition_class):: md_condition
 
         md_condition = md_condition_class()
 
         ndata = md_condition%nstep / md_condition%intd
+        np = md_condition%np
         dt = md_condition%dt
         intd = md_condition%intd
         temp0 = md_condition%temp0

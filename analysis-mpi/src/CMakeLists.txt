@@ -19,4 +19,9 @@ endmacro(ADDEXE)
 ### テストディレクトリの追加
 ADDEXE(gr io_file_mod md_condition_for_ana_mod)
 ADDEXE(temp io_file_mod md_condition_for_ana_mod)
-
+ADDEXE(GK_thcd io_file_mod md_condition_for_ana_mod const_mod fft_mod numerical_integration_mod)
+ADDEXE(GK_viscousity io_file_mod md_condition_for_ana_mod const_mod fft_mod numerical_integration_mod)
+ADDEXE(thcd io_file_mod md_condition_for_ana_mod const_mod representative_value_mod)
+ADDEXE(viscousity io_file_mod md_condition_for_ana_mod const_mod representative_value_mod)
+ADDEXE(msd io_file_mod md_condition_for_ana_mod const_mod representative_value_mod mean_square_displacement_mod)
+ADDEXE(rmsd io_file_mod md_condition_for_ana_mod const_mod representative_value_mod mean_square_displacement_mod)
