@@ -2,15 +2,13 @@
 set -euo pipefail
 trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
+. "$(dirname "$0")/lib/common.sh"
 
 readonly NAME_TARGET_PROJECT="$1"
 readonly FST_RUN="$2"
 readonly LST_RUN="$3"
 readonly NUM_PARA="$4"
 
-DIR_ROOT="$(cd "$(dirname "$0")/.."; pwd)"
-readonly DIR_ROOT
-readonly DIR_PROJECT_PATHS="/hdd1/abe/non-trial/md-service/output/project-paths"
 
 gen_task_list () {
     local -r name_target_project="$1"
