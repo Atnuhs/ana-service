@@ -4,7 +4,7 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
 readonly DIR_ROOT="$(cd "$(dirname "$0")/.."; pwd)"
 readonly DIR_BUILD="${DIR_ROOT}/build"
-readonly DIR_PROJECT_PATHS="/hdd1/abe/non-trial/md-service/output/project-paths"
+readonly DIR_PROJECT_PATHS="/hdd1/hdd2/abe/diatomic/md-diatomic-run/output/project-paths"
 
 
 split_file() {

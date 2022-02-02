@@ -15,6 +15,6 @@ gen_task_list () {
 
 while read -r task
 do
-    mkdir -p "$task/Analysis" && cd "$task/Analysis"
+    mkdir -p "$task/Analysis/viscousity" && cd "$task/Analysis"
     "${DIR_ROOT}/build/src/viscousity.out" <<< "$FST_CALC $LST_CALC"
 done < <(gen_task_list "${NAME_TARGET_PROJECT}")

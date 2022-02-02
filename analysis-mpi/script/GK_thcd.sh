@@ -16,6 +16,6 @@ gen_task_list () {
 
 while read -r task
 do
-    mkdir -p "$task/Analysis" && cd "$task/Analysis"
+    mkdir -p "$task/Analysis/GK_thcd" && cd "$task/Analysis"
     mpirun -n "${NUM_PARA}" "${DIR_ROOT}/build/src/GK_thcd.out" <<< "$FST_RUN $LST_RUN"
 done < <(gen_task_list "${NAME_TARGET_PROJECT}")
