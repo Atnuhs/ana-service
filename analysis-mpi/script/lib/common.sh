@@ -3,7 +3,7 @@ set -euo pipefail
 trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
 # shellcheck source=/dev/null
-. "$(dirname "$0")../setting/.env"
+. "$(dirname "$0")/../../setting/.env"
 
 DIR_ROOT="$(cd "$(dirname "$0")/.."; pwd)"
 readonly DIR_BUILD="${DIR_ROOT}/build"
