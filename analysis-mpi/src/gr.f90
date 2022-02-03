@@ -80,7 +80,6 @@ contains
         integer(int32):: idata,id,i,j
 
         do idata=1,ndata
-            if (mod(idata,100)==0) print*, idata, ndata
             do i=1,np
                 ri(:) = rxyz(:,i,idata)
                 do j=i+1,np
