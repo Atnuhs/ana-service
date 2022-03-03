@@ -16,19 +16,19 @@ do
         file_iemls="${task}/Analysis/viscousity/integ_acf_stress_mean_lm_sp.txt"
 
         if [ -f "${FILE_RESULT}" ]; then
-            header="$(echo -e "y_${rate}\tyse_${rate}")"
+            header="$(echo -e "y_${rate}")"
             paste "${FILE_RESULT}" <(awk -v header="${header}" '
                 BEGIN{OFS="\t"; print header}
-                {print $2, $3}
+                {print $2}
             ' "${file_iemls}") > "${FILE_RESULT}.tmp"
             
             mv "${FILE_RESULT}.tmp" "${FILE_RESULT}"
 
         else
-            header="$(echo -e "x\ty_${rate}\tyse_${rate}")"
+            header="$(echo -e "x\ty_${rate}")"
             awk -v header="${header}" '
                 BEGIN{OFS="\t"; print header}
-                {print $1, $2, $3}
+                {print $1, $2}
             ' "${file_iemls}" >"${FILE_RESULT}"
         fi
     done < "${file_project_paths}"

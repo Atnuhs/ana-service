@@ -13,7 +13,7 @@ do
     while read task
     do
         dir_analysis="${task}/Analysis"
-        file_thcd="${dir_analysis}/msd/translational_diffusion_coefficient_mean.txt"
+        file_thcd="${dir_analysis}/msd/tdc.txt"
         file_temp="${dir_analysis}/temp/temp_mean.txt"
         # TODO　別の参照方法を考える
         rate="${task##*/}"

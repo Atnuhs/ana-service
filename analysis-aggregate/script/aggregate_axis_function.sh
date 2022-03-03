@@ -6,14 +6,14 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
 readonly FILE_RESULT="${DIR_OUTPUT}/aggregate_axis_function.tsv"
 
-
 while read filename_project_struct fst_run lst_run 
 # use only filename_project_struct
 do
     file_project_paths="${DIR_PROJECT_PATHS}/${filename_project_struct}"
     while read task
     do
-        # get output_param.dat at run01
+        # get output_param.dat at run01:
+        
         dir_run01="${task}/calculation/run$(printf '%02d' $fst_run)"
         file_param="${dir_run01}/output_param.dat"
         header="$(awk '{print $1}' ${file_param} | paste -s)"

@@ -37,14 +37,14 @@ run01のstep\tstep\trun数\ttemp0\tdt\t統計量"
         pre_step="$(sed -n 1P ${file_condition_input})"
         step=${pre_step% ! nstep}
         pre_temp0="$(sed -n 2P ${file_condition_input})"
-        temp0=${pre_temp0% ! temp0}
+        temp0=${pre_temp0%!temp0}
         pre_dt="$(sed -n 4P ${file_condition_input})"
-        ddt=${pre_dt% ! dt}
+        ddt=${pre_dt%!dt}
         dt=${ddt//d/e}
         num_run="$(cat ${file_current_run})"
+        echo $step
         stat_time=$(python -c "print($step*($num_run-1)*$dt)")
-        echo -e "${project_path}\t${variable}\t${rate}\t\
-${step_run01}\t${step}\t${num_run}\t${temp0}\t${dt}\t${stat_time}"
+        echo -e "${project_path}\t${variable}\t${rate}\t${step_run01}\t${step}\t${num_run}\t${temp0}\t${dt}\t${stat_time}"
 
     done < "${file_project_paths}"
 done < <(tail -n +2 "${FILE_TASK_SETTING}") | tee "${FILE_RESULT}"

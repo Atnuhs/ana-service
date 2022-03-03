@@ -9,7 +9,7 @@ readonly DIR_AGGREGATE="$(cd $(dirname $0)/..; pwd)"
 readonly DIR_SCRIPT="$(cd $(dirname $0); pwd)"
 readonly DIR_LIB="${DIR_SCRIPT}/lib"
 
-readonly DIR_MD_SERVICE="${DIR_ROOT}/md-service"
+readonly DIR_MD_SERVICE="${DIR_ROOT}/md-diatomic-run"
 readonly DIR_CALCULATION="${DIR_ROOT}/calculation"
 
 readonly DIR_MD_SERVICE_OUTPUT="${DIR_MD_SERVICE}/output"
