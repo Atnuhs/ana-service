@@ -13,7 +13,7 @@ do
     while read task
     do
         rate="${task##*/}"
-        file_iemls="${task}/Analysis/thcd/integ_acf_ej_mean_lm_sp.txt"
+        file_iemls="${task}/Analysis/thcd/integ.txt"
 
         if [ -f "${FILE_RESULT}" ]; then
             header="$(echo -e "y_${rate}")"
