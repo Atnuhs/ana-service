@@ -12,6 +12,6 @@ cd "$(dirname "$0")"
 # ./aggregate_t_diff_coef.sh
 # ./aggregate_r_diff_coef.sh
 
-./aggregate_gr.sh
+# ./aggregate_gr.sh
 ./aggregate_iemls.sh
 ./aggregate_ismls.sh

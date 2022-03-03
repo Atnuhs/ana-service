@@ -3,14 +3,13 @@ set -euo pipefail
 trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 . "$(dirname $0)/lib/common.sh"
 
+readonly DIR_RESULT="$DIR_ROOT/output/$NAME_TARGET_PROJECT"
+mkdir -p "$DIR_RESULT"
+readonly FILE_RESULT="$DIR_RESULT/GK_integ_viscousity.tsv"
 
-readonly FILE_RESULT="${DIR_OUTPUT}/aggregate_ismls.tsv"
-[ -f "${FILE_RESULT}" ] && rm "${FILE_RESULT}"
+[ -f "$FILE_RESULT" ] && rm "$FILE_RESULT"
 
-while read filename_project_struct fst_run lst_run
-do
-    file_project_paths="${DIR_PROJECT_PATHS}/${filename_project_struct}"
-    while read task
+    while read -r task
     do
         rate="${task##*/}"
         file_iemls="${task}/Analysis/viscousity/integ.txt"
@@ -31,5 +30,4 @@ do
                 {print $1, $2}
             ' "${file_iemls}" >"${FILE_RESULT}"
         fi
-    done < "${file_project_paths}"
-done < <(tail -n +2 "${FILE_TASK_SETTING}")
+    done < <(gen_task_list)

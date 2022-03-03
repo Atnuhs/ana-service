@@ -1,23 +1,23 @@
 #!/bin/bash
-set -eu -o pipefail
+set -euo pipefail
 trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
+# shellcheck source=/dev/null
+. "$(dirname "$0")/../../setting/.env"
 
-readonly DIR_ROOT="$(cd $(dirname $0)/../../..; pwd)"
-readonly DIR_ANALYSIS_SERVICE="$(cd $(dirname $0)/../..; pwd)"
-readonly DIR_AGGREGATE="$(cd $(dirname $0)/..; pwd)"
-readonly DIR_SCRIPT="$(cd $(dirname $0); pwd)"
-readonly DIR_LIB="${DIR_SCRIPT}/lib"
+DIR_ROOT="$(cd "$(dirname "$0")/.."; pwd)"
 
-readonly DIR_MD_SERVICE="${DIR_ROOT}/md-diatomic-run"
-readonly DIR_CALCULATION="${DIR_ROOT}/calculation"
+# .envファイルで設定されている変数に読み取りのみの属性を付加
+readonly DIR_PROJECT_PATHS NAME_TARGET_PROJECT
+readonly FST_RUN LST_RAN
+readonly FST_CALC LST_CALC
+readonly NUM_PARA
 
-readonly DIR_MD_SERVICE_OUTPUT="${DIR_MD_SERVICE}/output"
-readonly DIR_PROJECT_PATHS="${DIR_MD_SERVICE_OUTPUT}/project-paths"
-readonly DIR_PROJECT_STRUCT="${DIR_MD_SERVICE_OUTPUT}/project-struct"
+gen_task_list () {
+    cat "${DIR_PROJECT_PATHS}/${NAME_TARGET_PROJECT}.txt"
+}
 
-readonly DIR_OUTPUT="${DIR_AGGREGATE}/output"
-
-readonly FILE_TASK_SETTING="${DIR_ANALYSIS_SERVICE}/setting/target_projects.tsv"
-readonly FILE_HOSTS="${DIR_ANALYSIS_SERVICE}/setting/excution_hosts.tsv"
-
+split_file() {
+    sp=$1 # 何行おきにの出力か
+    awk "NR%${sp}==1"
+}
