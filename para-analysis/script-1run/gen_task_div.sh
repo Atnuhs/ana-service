@@ -3,7 +3,7 @@ set -euo pipefail
 trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 . "$(dirname $0)/lib/common_1run.sh"
 
-all_task_num () { cat "${FILE_TASK_ALL}" | wc -l ;}
+all_task_num () { < "${FILE_TASK_ALL}" wc -l ;}
 all_core_num () { awk '{sum+=$2} END{print sum;}' "${FILE_HOSTS}" ;}
 file_task () { echo "${DIR_TASK}/task_${1}.txt" ;}
 
@@ -31,8 +31,8 @@ echo "all task :: $(all_task_num) => ${FILE_TASK_ALL##*/}"
 readed_line=0
 while read host_name core_num
 do
-    file_result="$(file_task ${host_name})"
-    part_task_num="$(part_task_num ${host_name} ${core_num})"
+    file_result="$(file_task "${host_name}")"
+    part_task_num="$(part_task_num "${host_name}" "${core_num}")"
 
     r_top="$(( readed_line+1 ))"
     r_bottom="$(( readed_line+part_task_num ))"
@@ -40,10 +40,10 @@ do
     part_task_num=$(( r_bottom - r_top + 1 ))
 
     (( part_task_num == 0 )) &&
-        { : >${file_result} && continue ;}
+        { : >"${file_result}" && continue ;}
 
     echo "[ ${host_name} ] :: ${r_top}-${r_bottom} (${part_task_num}) => ${file_result##*/}"
-    cut_task "${r_top}" "${r_bottom}" | tee ${file_result}
+    cut_task "${r_top}" "${r_bottom}" | tee "${file_result}"
 
     readed_line="${r_bottom}"
 done < <(tail -n +2 "${FILE_HOSTS}")
