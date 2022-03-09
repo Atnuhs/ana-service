@@ -19,6 +19,11 @@ gen_task_list () {
     cat "${DIR_PROJECT_PATHS}/${project_name}.txt"
 }
 
+dir_result () {
+    local project_name=$1
+    echo "${DIR_ROOT}/output/${project_name}"
+}
+ 
 split_file() {
     local sp=$1 # 何行おきにの出力か
     awk "NR%${sp}==1"

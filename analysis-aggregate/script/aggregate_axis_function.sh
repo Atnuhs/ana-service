@@ -1,26 +1,28 @@
 #!/bin/bash
 set -euo pipefail
 trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
-. "$(dirname $0)/lib/common.sh"
+
+# shellcheck source=/dev/null
+. "$(dirname "$0")/lib/common.sh"
 
 
-readonly FILE_RESULT="${DIR_OUTPUT}/aggregate_axis_function.tsv"
-
-while read filename_project_struct fst_run lst_run 
-# use only filename_project_struct
+while read -r project_name 
 do
-    file_project_paths="${DIR_PROJECT_PATHS}/${filename_project_struct}"
-    while read task
+    dir_result="$(dir_result "$project_name")"
+    mkdir -p "$dir_result"
+    echo "$dir_result"
+
+    file_result="$dir_result/md_parameter.tsv"
+
+    while read -r task
     do
         # get output_param.dat at run01:
         
-        dir_run01="${task}/calculation/run$(printf '%02d' $fst_run)"
-        file_param="${dir_run01}/output_param.dat"
-        header="$(awk '{print $1}' ${file_param} | paste -s)"
-        params="$(awk '{print $2}' ${file_param} | paste -s)"
-        [ "${task}" == "$(head -n 1 ${file_project_paths})" ] \
-            && echo -e "taskname\t${header}"
+        file_param="${task}/calculation/run02/output_param.dat"
+        header="$(awk '{print $1}' "${file_param}" | paste -s)"
+        params="$(awk '{print $2}' "${file_param}" | paste -s)"
+        [ "$task" == "$(gen_task_list "$project_name" | head -n 1)" ] && echo -e "task_name\t$header"
         echo -e "${task}\t${params}"
 
-    done < "${file_project_paths}"
-done < <(tail -n +2 "${FILE_TASK_SETTING}") | tee "${FILE_RESULT}"
+    done < <(gen_task_list "$project_name") > "$file_result"
+done < "${FILE_TARGET_PROJECTS}"
