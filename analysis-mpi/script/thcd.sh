@@ -10,4 +10,4 @@ do
     mkdir -p "$task/Analysis/thcd" && cd "$task/Analysis"
     "${DIR_ROOT}/build/src/thcd.out" <<< "$FST_CALC $LST_CALC"
     head -n "$LST_CALC" "$task/Analysis/GK_thcd/integ.txt" | split_file 100 > "$task/Analysis/thcd/integ.txt"
-done < <(gen_task_list "${NAME_TARGET_PROJECT}")
+done < <(gen_task_list)
