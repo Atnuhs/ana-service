@@ -21,8 +21,7 @@ do
 
         rdc=$(sed -n 1P "${file_thcd}" | awk '{print $1}')
         rdc_sd=$(sed -n 1P "${file_thcd}" | awk '{print $2}')
-        [ "$task" == "$(gen_task_list "$project_name" | head -n 1)" ] &&
-            echo -e "task_name\trdc\trdc_sd" 
+        is_first_task "$project_name" "$task" && echo -e "task_name\trdc\trdc_sd" 
         echo -e "${task}\t${rdc}\t${rdc_sd}"
 
     done < <(gen_task_list "$project_name") > "$file_result"
