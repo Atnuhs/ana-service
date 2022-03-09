@@ -5,6 +5,8 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 # shellcheck source=/dev/null
 . "$(dirname "$0")/lib/common.sh"
 
+echo "### $0"
+
 while read -r project_name
 do
     dir_result="$(dir_result "$project_name")"
@@ -33,5 +35,6 @@ do
             
             mv "${file_result}.tmp" "${file_result}"
          fi
+         
     done < <(gen_task_list "$project_name")
 done < "${FILE_TARGET_PROJECTS}"
