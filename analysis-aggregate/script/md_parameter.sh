@@ -21,7 +21,8 @@ do
         file_param="${task}/calculation/run02/output_param.dat"
         header="$(awk '{print $1}' "${file_param}" | paste -s)"
         params="$(awk '{print $2}' "${file_param}" | paste -s)"
-        [ "$task" == "$(gen_task_list "$project_name" | head -n 1)" ] && echo -e "task_name\t$header"
+        [ "$task" == "$(gen_task_list "$project_name" | head -n 1)" ] &&
+            echo -e "task_name\t$header"
         echo -e "${task}\t${params}"
 
     done < <(gen_task_list "$project_name") > "$file_result"

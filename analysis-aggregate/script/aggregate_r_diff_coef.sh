@@ -1,26 +1,29 @@
 #!/bin/bash
 set -euo pipefail
 trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
-. "$(dirname $0)/lib/common.sh"
 
-readonly FILE_RESULT="${DIR_OUTPUT}/aggregate_r_diff_coef.tsv"
+# shellcheck source=/dev/null
+. "$(dirname "$0")/lib/common.sh"
 
 
-while read filename_project_struct fst_run lst_run
+while read -r project_name
 do
-    file_project_paths="${DIR_PROJECT_PATHS}/${filename_project_struct}"
-    echo "${file_project_paths}"
-    while read task
+    dir_result="$(dir_result "$project_name")"
+    mkdir -p "$dir_result"
+    echo "$dir_result"
+
+    file_result="$dir_result/rotational_diffusion_coefficient.tsv"
+
+    while read -r task
     do
         dir_analysis="${task}/Analysis"
         file_thcd="${dir_analysis}/rmsd/rdc.txt"
-        file_temp="${dir_analysis}/temp/temp_mean.txt"
-        # TODO　別の参照方法を考える
-        rate="${task##*/}"
-        temp=$(sed -n 1P ${file_temp} | awk '{print $2}')
-        rdc=$(sed -n 1P ${file_thcd} | awk '{print $1}')
-        rdc_sd=$(sed -n 1P ${file_thcd} | awk '{print $2}')
-        echo -e "${task}\t${rate}\t${rdc}\t${rdc_sd}\t${temp}"
 
-    done < "${file_project_paths}"
-done < <(tail -n +2 "${FILE_TASK_SETTING}") | tee "${FILE_RESULT}"
+        rdc=$(sed -n 1P "${file_thcd}" | awk '{print $1}')
+        rdc_sd=$(sed -n 1P "${file_thcd}" | awk '{print $2}')
+        [ "$task" == "$(gen_task_list "$project_name" | head -n 1)" ] &&
+            echo -e "task_name\trdc\trdc_sd" 
+        echo -e "${task}\t${rdc}\t${rdc_sd}"
+
+    done < <(gen_task_list "$project_name") > "$file_result"
+done < "${FILE_TARGET_PROJECTS}" 
