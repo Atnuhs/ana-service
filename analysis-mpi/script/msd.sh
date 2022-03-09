@@ -7,6 +7,8 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
 while read -r task
 do
-    mkdir -p "$task/Analysis/msd" && cd "$task/Analysis"
-    mpirun -n "$NUM_PARA" "${DIR_ROOT}/build/src/msd.out" <<< "$FST_RUN $LST_RUN"
+    init_dir_result "$task" 'msd'
+    cd "$task/Analysis"
+    pwd
+    mpirun -n "$NUM_PARA" "${DIR_ROOT}/build/src/msd.out" <<< "$FST_RUN $LST_RUN" > /dev/null
 done < <(gen_task_list)

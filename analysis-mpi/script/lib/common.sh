@@ -26,3 +26,13 @@ split_file() {
     sp=$1 # 何行おきにの出力か
     awk "NR%${sp}==1"
 }
+
+init_dir_result () {
+    local task=$1
+    local dirname_result=$2
+    local dir_result="$task/Analysis/$dirname_result"
+    if [ -f "$dir_result" ]; then
+        rm -rf "$dir_result"
+    fi
+    mkdir -p "$dir_result"
+}

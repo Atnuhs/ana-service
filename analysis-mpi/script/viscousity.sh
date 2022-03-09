@@ -7,7 +7,9 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
 while read -r task
 do
-    mkdir -p "$task/Analysis/viscousity" && cd "$task/Analysis"
-    "${DIR_ROOT}/build/src/viscousity.out" <<< "$FST_CALC $LST_CALC"
+    init_dir_result "$task" 'viscousity'
+    cd "$task/Analysis"
+    pwd
+    "${DIR_ROOT}/build/src/viscousity.out" <<< "$FST_CALC $LST_CALC" > /dev/null
     head -n "$LST_CALC" "$task/Analysis/GK_viscousity/integ.txt" | split_file 100 > "$task/Analysis/viscousity/integ.txt"
 done < <(gen_task_list)
