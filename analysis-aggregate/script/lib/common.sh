@@ -12,7 +12,7 @@ FILE_TARGET_PROJECTS="${DIR_SETTING}/target_projects.txt"
 
 readonly DIR_ROOT DIR_SETTING
 # .envファイルで設定されている変数に読み取りのみの属性を付加
-readonly DIR_PROJECT_PATHS NAME_TARGET_PROJECT
+readonly DIR_PROJECT_PATHS 
 
 gen_task_list () {
     local project_name=$1
@@ -22,6 +22,12 @@ gen_task_list () {
 dir_result () {
     local project_name=$1
     echo "${DIR_ROOT}/output/${project_name}"
+}
+
+is_first_task () {
+    local project_name=$1
+    local task=$2
+    test "$task" == "$(gen_task_list "$project_name" | head -n 1)" 
 }
  
 split_file() {
