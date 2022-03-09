@@ -7,7 +7,7 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
 DIR_ROOT="$(cd "$(dirname "$0")/.."; pwd)"
 readonly DIR_BUILD="${DIR_ROOT}/build"
-readonly FILE_TARGET_PROJECTS="${DIR_ROOT}/../setting/target_projects.tsv"
+readonly FILE_TARGET_PROJECTS="${DIR_ROOT}/../setting/target_projects.txt"
 
 # .envファイルで設定されている変数に読み取りのみの属性を付加
 readonly DIR_PROJECT_PATHS NAME_TARGET_PROJECT
@@ -19,7 +19,7 @@ gen_task_list () {
     while read -r line
     do
         cat "${DIR_PROJECT_PATHS}/${line}.txt"
-    done < <( tail -n +2 "${FILE_TARGET_PROJECTS}")
+    done < "${FILE_TARGET_PROJECTS}"
 }
 
 split_file() {

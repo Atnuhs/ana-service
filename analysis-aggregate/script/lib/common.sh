@@ -6,15 +6,20 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 . "$(dirname "$0")/../../setting/.env"
 
 DIR_ROOT="$(cd "$(dirname "$0")/.."; pwd)"
+DIR_SETTING="${DIR_ROOT}/../setting"
 
+FILE_TARGET_PROJECTS="${DIR_SETTING}/target_projects.txt"
+
+readonly DIR_ROOT DIR_SETTING
 # .envファイルで設定されている変数に読み取りのみの属性を付加
 readonly DIR_PROJECT_PATHS NAME_TARGET_PROJECT
 
 gen_task_list () {
-    cat "${DIR_PROJECT_PATHS}/${NAME_TARGET_PROJECT}.txt"
+    local project_name=$1
+    cat "${DIR_PROJECT_PATHS}/${project_name}.txt"
 }
 
 split_file() {
-    sp=$1 # 何行おきにの出力か
+    local sp=$1 # 何行おきにの出力か
     awk "NR%${sp}==1"
 }
