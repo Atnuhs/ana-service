@@ -9,9 +9,6 @@ DIR_ROOT="$(cd "$(dirname "$0")/.."; pwd)"
 
 # .envファイルで設定されている変数に読み取りのみの属性を付加
 readonly DIR_PROJECT_PATHS NAME_TARGET_PROJECT
-readonly FST_RUN LST_RAN
-readonly FST_CALC LST_CALC
-readonly NUM_PARA
 
 gen_task_list () {
     cat "${DIR_PROJECT_PATHS}/${NAME_TARGET_PROJECT}.txt"
