@@ -7,20 +7,34 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
 DIR_ROOT="$(cd "$(dirname "$0")/.."; pwd)"
 readonly DIR_BUILD="${DIR_ROOT}/build"
-readonly FILE_TARGET_PROJECTS="${DIR_ROOT}/../setting/target_projects.txt"
+readonly FILE_TARGET_PROJECTS="${DIR_ROOT}/../setting/target_projects.tsv"
 
 # .envファイルで設定されている変数に読み取りのみの属性を付加
 readonly DIR_PROJECT_PATHS NAME_TARGET_PROJECT
-readonly FST_RUN LST_RAN
-readonly GK_VIS_FST_CALC GK_VIS_LST_CALC
-readonly GK_THCD_FST_CALC GK_THCD_LST_CALC
 readonly NUM_PARA
 
-gen_task_list () {
-    while read -r line
+gen_task_and_run_range () {
+    while read -r line fst_run lst_run
     do
-        cat "${DIR_PROJECT_PATHS}/${line}.txt"
-    done < "${FILE_TARGET_PROJECTS}"
+        xargs -I{} echo "{} $fst_run $lst_run" <"${DIR_PROJECT_PATHS}/${line}.txt"
+    done < <( tail -n +2 "${FILE_TARGET_PROJECTS}" |
+        awk '{print $1,$2,$3}' )
+}
+
+gen_task_and_gk_thcd_range () {
+    while read -r line gk_thcd_fst_calc gk_thcd_lst_calc
+    do
+        xargs -I{} echo "{} $gk_thcd_fst_calc $gk_thcd_lst_calc" <"${DIR_PROJECT_PATHS}/${line}.txt"
+    done < <( tail -n +2 "${FILE_TARGET_PROJECTS}" |
+        awk '{print $1,$4,$5}')
+}
+
+gen_task_and_gk_vis_range () {
+    while read -r line gk_vis_fst_calc gk_vis_lst_calc
+    do
+        xargs -I{} echo "{} $gk_vis_fst_calc $gk_vis_lst_calc" <"${DIR_PROJECT_PATHS}/${line}.txt"
+    done < <( tail -n +2 "${FILE_TARGET_PROJECTS}" |
+        awk '{print $1,$6,$7}')
 }
 
 split_file() {
