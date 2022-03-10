@@ -10,6 +10,6 @@ do
     init_dir_result "$task" 'viscousity'
     cd "$task/Analysis"
     pwd
-    "${DIR_ROOT}/build/src/viscousity.out" <<< "$FST_CALC $LST_CALC" > /dev/null
-    head -n "$LST_CALC" "$task/Analysis/GK_viscousity/integ.txt" | split_file 100 > "$task/Analysis/viscousity/integ.txt"
+    "${DIR_ROOT}/build/src/viscousity.out" <<< "$GK_VIS_FST_CALC $GK_VIS_LST_CALC" > /dev/null
+    head -n "$GK_VIS_LST_CALC" "$task/Analysis/GK_viscousity/integ.txt" | split_file 100 > "$task/Analysis/viscousity/integ.txt"
 done < <(gen_task_list)

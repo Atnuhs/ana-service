@@ -12,7 +12,8 @@ readonly FILE_TARGET_PROJECTS="${DIR_ROOT}/../setting/target_projects.txt"
 # .envファイルで設定されている変数に読み取りのみの属性を付加
 readonly DIR_PROJECT_PATHS NAME_TARGET_PROJECT
 readonly FST_RUN LST_RAN
-readonly FST_CALC LST_CALC
+readonly GK_VIS_FST_CALC GK_VIS_LST_CALC
+readonly GK_THCD_FST_CALC GK_THCD_LST_CALC
 readonly NUM_PARA
 
 gen_task_list () {
