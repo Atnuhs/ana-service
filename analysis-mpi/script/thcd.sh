@@ -10,6 +10,6 @@ do
     init_dir_result "$task" 'thcd'
     cd "$task/Analysis"
     pwd
-    "${DIR_ROOT}/build/src/thcd.out" <<< "$FST_CALC $LST_CALC" > /dev/null
-    head -n "$LST_CALC" "$task/Analysis/GK_thcd/integ.txt" | split_file 100 > "$task/Analysis/thcd/integ.txt"
+    "${DIR_ROOT}/build/src/thcd.out" <<< "$GK_THCD_FST_CALC $GK_THCD_LST_CALC" > /dev/null
+    head -n "$GK_THCD_LST_CALC" "$task/Analysis/GK_thcd/integ.txt" | split_file 100 > "$task/Analysis/thcd/integ.txt"
 done < <(gen_task_list)
