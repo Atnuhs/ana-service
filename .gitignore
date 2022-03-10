@@ -60,3 +60,5 @@ output/
 setting/*
 dist/
 *.tmp
+
+!*.sample
