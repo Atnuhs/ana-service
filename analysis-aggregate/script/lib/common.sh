@@ -1,23 +1,36 @@
 #!/bin/bash
-set -eu -o pipefail
+set -euo pipefail
 trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
+# shellcheck source=/dev/null
+. "$(dirname "$0")/../../setting/.env"
 
-readonly DIR_ROOT="$(cd $(dirname $0)/../../..; pwd)"
-readonly DIR_ANALYSIS_SERVICE="$(cd $(dirname $0)/../..; pwd)"
-readonly DIR_AGGREGATE="$(cd $(dirname $0)/..; pwd)"
-readonly DIR_SCRIPT="$(cd $(dirname $0); pwd)"
-readonly DIR_LIB="${DIR_SCRIPT}/lib"
+DIR_ROOT="$(cd "$(dirname "$0")/.."; pwd)"
+DIR_SETTING="${DIR_ROOT}/../setting"
 
-readonly DIR_MD_SERVICE="${DIR_ROOT}/md-service"
-readonly DIR_CALCULATION="${DIR_ROOT}/calculation"
+FILE_TARGET_PROJECTS="${DIR_SETTING}/target_projects.txt"
 
-readonly DIR_MD_SERVICE_OUTPUT="${DIR_MD_SERVICE}/output"
-readonly DIR_PROJECT_PATHS="${DIR_MD_SERVICE_OUTPUT}/project-paths"
-readonly DIR_PROJECT_STRUCT="${DIR_MD_SERVICE_OUTPUT}/project-struct"
+readonly DIR_ROOT DIR_SETTING
+# .envファイルで設定されている変数に読み取りのみの属性を付加
+readonly DIR_PROJECT_PATHS 
 
-readonly DIR_OUTPUT="${DIR_AGGREGATE}/output"
+gen_task_list () {
+    local project_name=$1
+    cat "${DIR_PROJECT_PATHS}/${project_name}.txt"
+}
 
-readonly FILE_TASK_SETTING="${DIR_ANALYSIS_SERVICE}/setting/target_projects.tsv"
-readonly FILE_HOSTS="${DIR_ANALYSIS_SERVICE}/setting/excution_hosts.tsv"
+dir_result () {
+    local project_name=$1
+    echo "${DIR_ROOT}/output/${project_name}"
+}
 
+is_first_task () {
+    local project_name=$1
+    local task=$2
+    test "$task" == "$(gen_task_list "$project_name" | head -n 1)" 
+}
+ 
+split_file() {
+    local sp=$1 # 何行おきにの出力か
+    awk "NR%${sp}==1"
+}

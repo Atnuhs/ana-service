@@ -57,5 +57,8 @@ _deps
 
 task/
 output/
-setting/
+setting/*
 dist/
+*.tmp
+
+!*.sample

@@ -12,4 +12,4 @@ readonly FILE_EXE=$(file_exe viscousity.out)
 ana_allrun "${FILE_EXE}" "${DIR_OUTPUT}" "${FST_RUN}" "${LST_RUN}"
 
 
-cat "${DIR_OUTPUT}/integ_stress_mean_lm.txt" | split_file '10' > "${DIR_OUTPUT}/integ_stress_mean_lm_sp.txt" 
+cat "${DIR_OUTPUT}/integ_acf_stress_mean_lm.txt" | split_file '10' > "${DIR_OUTPUT}/integ_acf_stress_mean_lm_sp.txt" 

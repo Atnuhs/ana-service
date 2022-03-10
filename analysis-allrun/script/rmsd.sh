@@ -11,5 +11,5 @@ readonly FILE_EXE=$(file_exe rmsd.out)
 
 ana_allrun "${FILE_EXE}" "${DIR_OUTPUT}" "${FST_RUN}" "${LST_RUN}"
 
-cat "${DIR_OUTPUT}/rmsd_mean.txt" | split_file '100' > "${DIR_OUTPUT}/rmsd_mean_sp.txt" 
-cat "${DIR_OUTPUT}/rmsd_all.txt" | split_file '100' > "${DIR_OUTPUT}/rmsd_all_sp.txt" 
+cat "${DIR_OUTPUT}/rmsd_mean_mean.txt" | split_file '100' > "${DIR_OUTPUT}/rmsd_mean_mean_sp.txt" 
+cat "${DIR_OUTPUT}/rmsd_mean_all.txt" | split_file '100' > "${DIR_OUTPUT}/rmsd_mean_all_sp.txt" 

@@ -31,6 +31,7 @@ ana_allrun () {
     local -r file_exe=$1 dir_output=$2 fst_run=$3 lst_run=$4
     # 実行ファイルパス 結果ディレクトリのパス スタート、エンドRun数
 
+    [ -f "${dir_output}" ] && rm -r "${dir_output}"
     mkdir -p "${dir_output}"
     "${file_exe}" <<<"${fst_run} ${lst_run}"
 }

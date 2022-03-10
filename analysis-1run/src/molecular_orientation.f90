@@ -3,28 +3,33 @@ program main
     use md_condition_for_ana_mod
     implicit none
     integer(int32),parameter:: np=500, nlen=100
-    integer(int32):: ndata, i
-    real(real64):: rc, cell, dr, max_r
+    integer(int32):: ndata, ix, iy
+    real(real64):: cell, dr, max_r
     real(real64),allocatable:: rg(:,:,:), arrow(:,:,:), mo1(:,:), mo2(:,:)
 
-    call load_condition_for_molecular_orientation_ana(ndata, rc, cell)
+    call load_condition_for_molecular_orientation_ana(ndata, cell)
     max_r = cell / 4d0 ! 半径どこまで見るか
     dr = max_r/dble(nlen) ! 0~max_rをnlen刻み
     allocate(mo1(90,nlen), mo2(90,nlen))
     allocate(rg(3,np,ndata), arrow(3,np,ndata))
     call load_rg_and_arrow(rg, arrow, ndata, np)
-    call calc_molecular_orientation(rg, arrow, mo1, mo2, np, ndata, rc, cell)
+    call calc_molecular_orientation(rg, arrow, mo1, mo2, np, ndata, cell)
 
+    ! output -------------------------------------------------------------------------------
     open(unit=11, file='molecular_orientation/molecular_orientation.dat', status='replace')
-        do i=1,90
-            write(11,*) dble(i)-0.5d0, mo1(i, :)
+        do ix=1,nlen
+            do iy=1,90
+                write(11,*) dble(ix-1)*dr, dble(iy)-0.5d0, mo1(iy, ix)
+            end do
         end do
     close(11)
 
 
     open(unit=12, file='molecular_orientation/molecular_orientation2.dat', status='replace')
-        do i=1,90
-            write(12,*) dble(i)-0.5d0, mo2(i, :)
+        do ix=1,nlen
+            do iy=1,90
+                write(12,*) dble(ix-1)*dr, dble(iy)-0.5d0, mo2(iy, ix)
+            end do
         end do
     close(12)
 contains
@@ -53,11 +58,14 @@ contains
 
         hcell = cell * 0.5d0
 
-        where(vec > hcell)
-            vec=vec-cell
-        else where(vec < -hcell)
-            vec=vec+cell
-        end where
+        if (vec(1) > hcell) vec(1)=vec(1)-cell
+        if (vec(1) < -hcell) vec(1)=vec(1)+cell
+
+        if (vec(2) > hcell) vec(2)=vec(2)-cell
+        if (vec(2) < -hcell) vec(2)=vec(2)+cell
+
+        if (vec(3) > hcell) vec(3)=vec(3)-cell
+        if (vec(3) < -hcell) vec(3)=vec(3)+cell
     end subroutine
 
 
@@ -82,8 +90,8 @@ contains
     end subroutine
 
 
-    subroutine  make_pair_list(rg, cell, rc, pair_list, pl_len)
-        real(real64), intent(in):: rg(:,:), cell, rc
+    subroutine  make_pair_list(rg, cell, pair_list, pl_len)
+        real(real64), intent(in):: rg(:,:), cell
         integer(int32),intent(out):: pair_list(:,:), pl_len
         integer(int32):: i, j
         real(real64):: rg1(3), rg2(3), rg12(3)
@@ -104,23 +112,25 @@ contains
     end subroutine
 
 
-    subroutine calc_molecular_orientation(rg, arrow, mo1, mo2, np, ndata, rc, cell)
+    subroutine calc_molecular_orientation(rg, arrow, mo1, mo2, np, ndata, cell)
         real(real64), parameter:: pi = acos(-1d0) 
         real(real64),intent(out):: mo1(:,:), mo2(:,:)
         integer(int32),intent(in):: np, ndata
-        real(real64),intent(in):: rc, cell, rg(:,:,:), arrow(:,:,:)
+        real(real64),intent(in):: cell, rg(:,:,:), arrow(:,:,:)
         integer(int32):: idata, i1, i2, idistance, iangle, i
         integer(int32):: pair_list(2, np*np), pl_len
         real(real64):: this_rg(3,np), this_arrow(3,np)
         real(real64):: rg12(3), distance
         real(real64):: angle
-        real(real64):: this_v, factor, nd
+        real(real64):: this_v, factor, nd, all_inv_v
 
         mo1(:,:) = 0
+        mo2(:,:) = 0
+        ! calculate ----------------------------------------------------
         do idata=1,ndata
             this_rg(:,:) = rg(:,:,idata)
             this_arrow(:,:) = arrow(:,:,idata)
-            call make_pair_list(this_rg(:,:), cell, rc, pair_list, pl_len)
+            call make_pair_list(this_rg(:,:), cell, pair_list, pl_len)
 
             do i=1,pl_len
                 i1 = pair_list(1,i)
@@ -132,20 +142,26 @@ contains
                 idistance = ceiling(distance / dr)
                 if (idistance > nlen) cycle
 
-                ! 軸-軸角度
+                ! 軸1-軸2角度
                 call calc_angle(this_arrow(:,i1), this_arrow(:,i2), angle)
                 iangle = ceiling(angle)
                 mo1(iangle, idistance) = mo1(iangle, idistance) + 2d0
 
-                ! 軸-重心12角度
+                ! 軸1-重心12角度
                 call calc_angle(this_arrow(:,i1), rg12(:), angle)
                 iangle = ceiling(angle)
-                mo2(iangle, idistance) = mo2(iangle, idistance) + 2d0
+                mo2(iangle, idistance) = mo2(iangle, idistance) + 1d0
+
+                ! 軸2-重心21角度
+                call calc_angle(this_arrow(:,i2), -rg12(:), angle)
+                iangle = ceiling(angle)
+                mo2(iangle, idistance) = mo2(iangle, idistance) + 1d0
             end do
         end do
 
-        ! normalize
+        ! normalize -------------------------------------------------------
         mo1(:,:) = mo1(:,:) / dble(ndata)
+        mo2(:,:) = mo2(:,:) / dble(ndata)
 
         ! 球殻に対して数密度の規格化
         factor = 4d0/3d0*pi * dr*dr*dr ! 球殻の体積を求めるときの係数部分
@@ -158,13 +174,18 @@ contains
         end do
         
         ! 角度に対して数密度の規格化
+        all_inv_v = 0d0
         do i=1,90
             ! x軸からの角度がi-1°~i°の扇形をx軸を回転軸として回転させた時の体積
-            ! 規格化のため、半球の体積が1となるような半径を用いる
+            ! (規格化のため、半球の体積が1となるような半径を用いる)
+            ! 参考: http://ralfbalt.blog66.fc2.com/blog-entry-857.html
             this_v = cos(dble(i-1)*pi/180d0) - cos(dble(i)*pi/180d0)
+            all_inv_v = all_inv_v + 1d0 / this_v
             mo1(i,:) = mo1(i,:) / this_v
             mo2(i,:) = mo2(i,:) / this_v
         end do
 
+        mo1(:,:) = mo1(:,:) / all_inv_v
+        mo2(:,:) = mo2(:,:) / all_inv_v
     end subroutine
 end program main

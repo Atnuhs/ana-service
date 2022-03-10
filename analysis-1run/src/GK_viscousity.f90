@@ -1,105 +1,58 @@
 program main
     use,intrinsic :: iso_fortran_env
+    use const_mod
+    use fft_mod
+    use read_md_results_mod
+    use io_file_mod
     use md_condition_for_ana_mod
     use numerical_integration_mod
-    use fft_mod
     implicit none
-    integer(int32):: ndata
+    integer(int32):: i, ndata
     real(real64), allocatable:: stress(:,:)
-    real(real64), allocatable:: acf_stress(:,:)
-    real(real64), allocatable:: integ_acf_stress(:,:)
+    real(real64), allocatable:: acf_stress(:)
+    real(real64), allocatable:: integ_acf_stress(:)
+    real(real64), allocatable:: x(:)
     real(real64):: temp, dt, vol
 
-    call load_condition_for_viscousity_ana(ndata=ndata, dt=dt, vol=vol)
+    ! 読み込み
+    call load_condition_for_GK_viscousity_ana(ndata=ndata, dt=dt, vol=vol)
     call read_temp_mean(temp)
     allocate(stress(ndata,3))
-    allocate(acf_stress(ndata,3))
-    allocate(integ_acf_stress(ndata,3))
-
-    ! 読み込み
-    call read_stress(stress, ndata)
+    allocate(acf_stress(ndata))
+    allocate(integ_acf_stress(ndata))
+    call read_stress(ndata, stress)
     
     ! 計算
-    call calc_acf_stress(acf_stress=acf_stress, stress=stress, ndata=ndata, vol=vol, temp=temp)
-    call calc_integ_acf_stress(integ_acf_stress=integ_acf_stress, acf_stress=acf_stress, ndata=ndata, dt=dt)
+    call calc_acf_stress()
+    call calc_integ_acf_stress()
 
     ! 出力
-    call output_acf_stress(acf_stress=acf_stress, ndata=ndata, dt=dt)
-    call output_integ_acf_stress(integ_acf_stress=integ_acf_stress, ndata=ndata, dt=dt)
+    allocate(x(ndata), source=[(dt*dble(i-1), i=1,ndata)])
+    call write_arx_ary(ndata, 'GK_viscousity/acf_stress.dat', x, acf_stress)
+    call write_arx_ary(ndata, 'GK_viscousity/integ_acf_stress.dat', x, integ_acf_stress)
 contains
     subroutine read_temp_mean(temp)
-        character(100),parameter:: file_temp_mean='temp/temp_mean.dat'
-        real(real64):: temp
-        integer(int32):: u_temp_mean
-        
-        open(newunit=u_temp_mean, file=file_temp_mean, status='old')
-            read(u_temp_mean, *) temp
-        close(u_temp_mean)
+        real(real64),intent(out):: temp
+
+        call read_x('temp/temp_mean.dat', temp)
     end subroutine
 
 
-    subroutine read_stress(stress, ndata)
-        character(100),parameter:: file_name='../stress.dat'
-        real(real64),intent(out):: stress(:,:)
-        integer(int32),intent(in):: ndata
-        integer(int32):: i,u_stress
-
-        open(newunit=u_stress,file=file_name,status='old')
-            read(u_stress,*) (stress(i,:), i=1,ndata)
-        close(u_stress)
-    end subroutine
-
-
-    subroutine calc_acf_stress(stress, acf_stress, ndata, vol, temp)
-        real(real64),parameter:: kbt = 1.380658d-23
-        real(real64),intent(out):: acf_stress(:,:)
-        integer(int32),intent(in):: ndata
-        real(real64),intent(in):: stress(:,:), vol, temp
+    subroutine calc_acf_stress()
         integer(int32):: i
-        
+
+        acf_stress(:) = 0d0
         call init_acf(ndata)
         do i=1,3
-            acf_stress(:,i) = auto_correlation_function(stress(:,i))
+            acf_stress(:) = acf_stress(:) + auto_correlation_function(stress(:,i))
         end do
-        acf_stress(:,:) = acf_stress(:,:) / (dble(ndata)*vol*kbt*temp)
-
+        acf_stress(:) = acf_stress(:) / (dble(ndata)*vol*kbt*temp*3d0)
     end subroutine
 
 
-    subroutine calc_integ_acf_stress(integ_acf_stress, acf_stress, ndata, dt)
-        real(real64),intent(out):: integ_acf_stress(:,:)
-        integer(int32),intent(in):: ndata
-        real(real64),intent(in):: acf_stress(:,:), dt
+    subroutine calc_integ_acf_stress()
         integer(int32):: i
 
-        do concurrent(i=1:3)
-            integ_acf_stress(:,i) = trapezoidal_integration(f=acf_stress(:,i),dx=dt,n=ndata)
-        end do
-    end subroutine
-
-
-    subroutine output_acf_stress(acf_stress, ndata, dt)
-        character(100),parameter:: file_acf_stress = 'GK_viscousity/acf_stress.dat'
-        real(real64),parameter:: inv3=1d0/3d0
-        integer(int32),intent(in):: ndata
-        real(real64),intent(in):: acf_stress(:,:), dt
-        integer(int32):: i, u_acf_stress
-
-        open(newunit=u_acf_stress, file=file_acf_stress, status='replace')
-            write(u_acf_stress,'(2e20.10)') (dt*dble(i-1), sum(acf_stress(i,:))*inv3, i=1,ndata)
-        close(u_acf_stress)
-    end subroutine
-
-
-    subroutine output_integ_acf_stress(integ_acf_stress, ndata, dt)
-        character(100),parameter:: file_integ_acf_stress = 'GK_viscousity/integ_acf_stress.dat'
-        real(real64),parameter:: inv3=1d0/3d0
-        integer(int32),intent(in):: ndata
-        real(real64),intent(in):: integ_acf_stress(:,:), dt
-        integer(int32):: i, u_integ_acf_stress
-
-        open(newunit=u_integ_acf_stress, file=file_integ_acf_stress, status='replace')
-            write(u_integ_acf_stress,'(2e20.10)') (dt*dble(i-1), sum(integ_acf_stress(i,:))*inv3, i=1,ndata)
-        close(u_integ_acf_stress)
+        integ_acf_stress(:) = trapezoidal_integration(f=acf_stress,dx=dt,n=ndata)
     end subroutine
 end program
