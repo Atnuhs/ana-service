@@ -33,7 +33,7 @@ contains
         call mpi_bcast(lst_run, 1, mpi_integer, 0, mpi_comm_world, ierr)
         call load_condition_for_ext_gr_ana(ndata, np, cell)
         all_run = lst_run - fst_run + 1
-        dr = 0.5d0 * cell / dble(gr_len) ! 球殻の厚み
+        dr = 2d-11 ! 球殻の厚み
         allocate(sxyz(3,3,np,ndata))
         allocate(gr_gp(gr_len), gr_pp(gr_len), gr_gg(gr_len), source=0d0)
 

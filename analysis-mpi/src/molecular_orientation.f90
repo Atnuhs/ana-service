@@ -34,7 +34,7 @@ contains
 
         call load_condition_for_molecular_orientation_ana(ndata, np, cell)
         all_run = lst_run - fst_run + 1
-        dr = cell*0.5d0 / dble(gr_len) ! 球殻の厚さ
+        dr = 2d-11 ! 球殻の厚さ
         allocate(mo_pp(90,gr_len), mo_gp(90,gr_len))
         allocate(rg(3,np,ndata), arrow(3,np,ndata))
         
