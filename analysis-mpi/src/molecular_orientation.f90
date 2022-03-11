@@ -11,7 +11,7 @@ program main
     real(real64):: cell, dr
     real(real64),allocatable:: rg(:,:,:)
     real(real64),allocatable:: arrow(:,:,:)
-    real(real64),allocatable:: mopp(:,:), mogp(:,:)
+    real(real64),allocatable:: mo_pp(:,:), mo_gp(:,:)
     
     
     call mpi_init(ierr)
@@ -24,7 +24,7 @@ contains
         integer(int32):: fst_run, lst_run, all_run
         integer(int32):: ix, iy, irun
         character(100):: file_sxyz
-        real(real64), allocatable:: mopp_global(:,:), mogp_global(:,:)
+        real(real64), allocatable:: mo_pp_global(:,:), mo_gp_global(:,:)
         real(real64), allocatable:: x(:), y(:)
         
 
@@ -35,7 +35,7 @@ contains
         call load_condition_for_molecular_orientation_ana(ndata, np, cell)
         all_run = lst_run - fst_run + 1
         dr = cell*0.5d0 / dble(gr_len) ! 球殻の厚さ
-        allocate(mopp(90,gr_len), mogp(90,gr_len))
+        allocate(mo_pp(90,gr_len), mo_gp(90,gr_len))
         allocate(rg(3,np,ndata), arrow(3,np,ndata))
         
         do irun=fst_run+rank, lst_run, procs
@@ -45,23 +45,23 @@ contains
             call calc_molecular_orientation()
         end do 
 
-        allocate(mogp_global(90,gr_len))
-        allocate(mopp_global(90,gr_len))
-        call mpi_reduce(mogp, mogp_global, gr_len*90, mpi_double_precision, mpi_sum, 0, mpi_comm_world, ierr)
-        call mpi_reduce(mopp, mopp_global, gr_len*90, mpi_double_precision, mpi_sum, 0, mpi_comm_world, ierr)
+        allocate(mo_gp_global(90,gr_len))
+        allocate(mo_pp_global(90,gr_len))
+        call mpi_reduce(mo_gp, mo_gp_global, gr_len*90, mpi_double_precision, mpi_sum, 0, mpi_comm_world, ierr)
+        call mpi_reduce(mo_pp, mo_pp_global, gr_len*90, mpi_double_precision, mpi_sum, 0, mpi_comm_world, ierr)
 
         if (rank==0) then 
-            mogp_global(:,:) = mogp_global(:,:) / dble(ndata*all_run)
-            mopp_global(:,:) = mopp_global(:,:) / dble(ndata*all_run)
+            mo_gp_global(:,:) = mo_gp_global(:,:) / dble(ndata*all_run)
+            mo_pp_global(:,:) = mo_pp_global(:,:) / dble(ndata*all_run)
             
-            call normalize_molecular_orientation(mogp_global)
-            call normalize_molecular_orientation(mopp_global)
+            call normalize_molecular_orientation(mo_gp_global)
+            call normalize_molecular_orientation(mo_pp_global)
             
             allocate(x(gr_len), source=[(ix*dr, ix=1,gr_len)])
             allocate(y(90), source=[(iy-0.5d0, iy=1,90)])
             
-            call write_arx_ary_arz('molecular_orientation/mo_gp.txt', gr_len, 90, x, y, mogp_global)
-            call write_arx_ary_arz('molecular_orientation/mo_pp.txt', gr_len, 90, x, y, mopp_global)
+            call write_arx_ary_arz('molecular_orientation/mo_gp.txt', gr_len, 90, x, y, mo_gp_global)
+            call write_arx_ary_arz('molecular_orientation/mo_pp.txt', gr_len, 90, x, y, mo_pp_global)
         end if
     end subroutine
 
@@ -110,8 +110,8 @@ contains
         integer(int32):: idata, i1, i2, id, iangle, i
         real(real64):: gg(3), pp1(3), pp2(3)
 
-        mopp(:,:) = 0
-        mogp(:,:) = 0
+        mo_pp(:,:) = 0
+        mo_gp(:,:) = 0
         ! calculate ----------------------------------------------------
         do idata=1,ndata
             if (mod(idata,100) == 0) print*, idata, ndata
@@ -128,15 +128,15 @@ contains
 
                     ! 軸1-軸2角度
                     iangle = ceiling(calc_angle(pp1, pp2))
-                    mopp(iangle, id) = mopp(iangle, id) + 2d0
+                    mo_pp(iangle, id) = mo_pp(iangle, id) + 2d0
 
                     ! 軸1-重心12角度
                     iangle = ceiling(calc_angle(pp1, gg))
-                    mogp(iangle, id) = mogp(iangle, id) + 1d0
+                    mo_gp(iangle, id) = mo_gp(iangle, id) + 1d0
 
                     ! 軸2-重心21角度
                     iangle = ceiling(calc_angle(pp2, gg))
-                    mogp(iangle, id) = mogp(iangle, id) + 1d0
+                    mo_gp(iangle, id) = mo_gp(iangle, id) + 1d0
                 end do
             end do
         end do
