@@ -1,176 +1,162 @@
 program main
     use,intrinsic :: iso_fortran_env
+    use io_file_mod
     use md_condition_for_ana_mod
+    use const_mod
     implicit none
-    integer(int32),parameter:: np=500, nlen=100
-    integer(int32):: ndata, ix, iy
-    real(real64):: cell, dr, max_r
-    real(real64),allocatable:: rg(:,:,:), arrow(:,:,:), mo1(:,:), mo2(:,:)
-
-    call load_condition_for_molecular_orientation_ana(ndata, cell)
-    max_r = cell / 4d0 ! 半径どこまで見るか
-    dr = max_r/dble(nlen) ! 0~max_rをnlen刻み
-    allocate(mo1(90,nlen), mo2(90,nlen))
-    allocate(rg(3,np,ndata), arrow(3,np,ndata))
-    call load_rg_and_arrow(rg, arrow, ndata, np)
-    call calc_molecular_orientation(rg, arrow, mo1, mo2, np, ndata, cell)
-
-    ! output -------------------------------------------------------------------------------
-    open(unit=11, file='molecular_orientation/molecular_orientation.dat', status='replace')
-        do ix=1,nlen
-            do iy=1,90
-                write(11,*) dble(ix-1)*dr, dble(iy)-0.5d0, mo1(iy, ix)
-            end do
-        end do
-    close(11)
-
-
-    open(unit=12, file='molecular_orientation/molecular_orientation2.dat', status='replace')
-        do ix=1,nlen
-            do iy=1,90
-                write(12,*) dble(ix-1)*dr, dble(iy)-0.5d0, mo2(iy, ix)
-            end do
-        end do
-    close(12)
+    include 'mpif.h'
+    integer(int32),parameter:: gr_len=100
+    integer(int32):: procs, rank, ierr
+    integer(int32):: np, ndata
+    real(real64):: cell, dr
+    real(real64),allocatable:: rg(:,:,:)
+    real(real64),allocatable:: arrow(:,:,:)
+    real(real64),allocatable:: mopp(:,:), mogp(:,:)
+    
+    
+    call mpi_init(ierr)
+    call mpi_comm_size(mpi_comm_world, procs, ierr)
+    call mpi_comm_rank(mpi_comm_world, rank, ierr)
+    call main_routine()
+    call mpi_finalize(ierr)
 contains
-    subroutine load_rg_and_arrow(rg, arrow, ndata, np)
-        real(real64), intent(out):: rg(:,:,:), arrow(:,:,:)
-        real(real64), allocatable:: sxyz(:,:,:,:)
-        integer(int32),intent(in):: ndata, np
-        integer(int32):: i,j,k,u_sxyz
+    subroutine main_routine
+        integer(int32):: fst_run, lst_run, all_run
+        integer(int32):: ix, iy, irun
+        character(100):: file_sxyz
+        real(real64), allocatable:: mopp_global(:,:), mogp_global(:,:)
+        real(real64), allocatable:: x(:), y(:)
+        
 
-        allocate(sxyz(3,3,np,ndata))
-        open (newunit=u_sxyz, file='../sxyz.dat', status='old')
-            do i=1,ndata
-                read(u_sxyz, *)
-                read(u_sxyz, *) ((sxyz(:,k,j,i), k=1,3), j=1,np)
-            end do
-        close(u_sxyz)
-        rg(:,:,:) = sxyz(:,3,:,:)
-        arrow(:,:,:) = sxyz(:,1,:,:) - sxyz(:,2,:,:)
+        if (rank==0) read*, fst_run, lst_run
+        call mpi_bcast(fst_run, 1, mpi_integer, 0, mpi_comm_world, ierr)
+        call mpi_bcast(lst_run, 1, mpi_integer, 0, mpi_comm_world, ierr)
+
+        call load_condition_for_molecular_orientation_ana(ndata, np, cell)
+        all_run = lst_run - fst_run + 1
+        dr = cell*0.5d0 / dble(gr_len) ! 球殻の厚さ
+        allocate(mopp(90,gr_len), mogp(90,gr_len))
+        allocate(rg(3,np,ndata), arrow(3,np,ndata))
+        
+        do irun=fst_run+rank, lst_run, procs
+            file_sxyz = '../calculation/' // rundir(irun) // '/sxyz.dat'
+            print*, 'reading ... ', trim(file_sxyz), rank
+            call load_rg_and_arrow(file_sxyz, ndata, np, rg, arrow)
+            call calc_molecular_orientation()
+        end do 
+
+        allocate(mogp_global(90,gr_len))
+        allocate(mopp_global(90,gr_len))
+        call mpi_reduce(mogp, mogp_global, gr_len*90, mpi_double_precision, mpi_sum, 0, mpi_comm_world, ierr)
+        call mpi_reduce(mopp, mopp_global, gr_len*90, mpi_double_precision, mpi_sum, 0, mpi_comm_world, ierr)
+
+        if (rank==0) then 
+            mogp_global(:,:) = mogp_global(:,:) / dble(ndata*all_run)
+            mopp_global(:,:) = mopp_global(:,:) / dble(ndata*all_run)
+            
+            call normalize_molecular_orientation(mogp_global)
+            call normalize_molecular_orientation(mopp_global)
+            
+            allocate(x(gr_len), source=[(ix*dr, ix=1,gr_len)])
+            allocate(y(90), source=[(iy-0.5d0, iy=1,90)])
+            
+            call write_arx_ary_arz('molecular_orientation/mo_gp.txt', gr_len, 90, x, y, mogp_global)
+            call write_arx_ary_arz('molecular_orientation/mo_pp.txt', gr_len, 90, x, y, mopp_global)
+        end if
     end subroutine
 
 
-    subroutine adjust_periodic(vec, cell)
-        real(real64),intent(in):: cell
+    subroutine load_rg_and_arrow(file_sxyz, ndata, np, rg, arrow)
+        character(*),intent(in):: file_sxyz
+        integer(int32),intent(in):: ndata, np
+        real(real64), intent(out):: rg(:,:,:), arrow(:,:,:)
+        real(real64):: sxyz(3,3,np,ndata)
+
+        call read_sxyz(file_sxyz, ndata, np, sxyz)
+        rg(:,:,:) = sxyz(:,3,:,:)
+        arrow(:,:,:) = sxyz(:,1,:,:) - sxyz(:,2,:,:)
+    end subroutine
+    
+
+    subroutine adjust_periodic(vec)
         real(real64),intent(inout):: vec(3)
         real(real64):: hcell
 
         hcell = cell * 0.5d0
 
-        if (vec(1) > hcell) vec(1)=vec(1)-cell
-        if (vec(1) < -hcell) vec(1)=vec(1)+cell
-
-        if (vec(2) > hcell) vec(2)=vec(2)-cell
-        if (vec(2) < -hcell) vec(2)=vec(2)+cell
-
-        if (vec(3) > hcell) vec(3)=vec(3)-cell
-        if (vec(3) < -hcell) vec(3)=vec(3)+cell
+        where(vec > hcell)
+            vec=vec-cell
+        else where(vec < -hcell)
+            vec=vec+cell
+        end where
     end subroutine
 
 
-    subroutine calc_angle(v1, v2, angle)
-        real(real64),parameter:: pi = acos(-1d0)
+    function calc_angle(v1, v2) result(angle)
         real(real64),intent(in):: v1(3), v2(3)
-        real(real64),intent(out):: angle
+        real(real64):: angle
         real(real64):: costheta, rad
 
         costheta = dot_product(v1,v2) / (norm2(v1)*norm2(v2))
 
-        if (abs(costheta) > 1d0) then
-            print*, '変な値でた'
-            print*, costheta
-            print*, v1
-            print*, v2
-            error stop
-        end if
-
+        if (costheta > 1d0) costheta = 1d0
+        if (costheta < -1d0) costheta = -1d0 
         rad = acos(abs(costheta))
         angle = rad * 180d0 / pi
-    end subroutine
+    end function
 
 
-    subroutine  make_pair_list(rg, cell, pair_list, pl_len)
-        real(real64), intent(in):: rg(:,:), cell
-        integer(int32),intent(out):: pair_list(:,:), pl_len
-        integer(int32):: i, j
-        real(real64):: rg1(3), rg2(3), rg12(3)
+    subroutine calc_molecular_orientation()
+        integer(int32):: idata, i1, i2, id, iangle, i
+        real(real64):: gg(3), pp1(3), pp2(3)
 
-        pl_len=0
-        do i=1,np-1
-            rg1 = rg(:,i)
-            do j=i+1,np
-                rg2 = rg(:,j)
-                rg12 = rg2 - rg1
-                call adjust_periodic(rg12, cell)
-                if (norm2(rg12) > cell*0.5d0) cycle
-                pl_len = pl_len + 1
-                pair_list(1, pl_len) = i
-                pair_list(2, pl_len) = j
-            end do
-        end do
-    end subroutine
-
-
-    subroutine calc_molecular_orientation(rg, arrow, mo1, mo2, np, ndata, cell)
-        real(real64), parameter:: pi = acos(-1d0) 
-        real(real64),intent(out):: mo1(:,:), mo2(:,:)
-        integer(int32),intent(in):: np, ndata
-        real(real64),intent(in):: cell, rg(:,:,:), arrow(:,:,:)
-        integer(int32):: idata, i1, i2, idistance, iangle, i
-        integer(int32):: pair_list(2, np*np), pl_len
-        real(real64):: this_rg(3,np), this_arrow(3,np)
-        real(real64):: rg12(3), distance
-        real(real64):: angle
-        real(real64):: this_v, factor, nd, all_inv_v
-
-        mo1(:,:) = 0
-        mo2(:,:) = 0
+        mopp(:,:) = 0
+        mogp(:,:) = 0
         ! calculate ----------------------------------------------------
         do idata=1,ndata
-            this_rg(:,:) = rg(:,:,idata)
-            this_arrow(:,:) = arrow(:,:,idata)
-            call make_pair_list(this_rg(:,:), cell, pair_list, pl_len)
+            if (mod(idata,100) == 0) print*, idata, ndata
+            do i1=1,np-1
+                pp1(:) = arrow(:,i1,idata) 
+                do i2=i1+1,np
+                    pp2(:) = arrow(:,i2,idata)
+                    gg(:) = rg(:,i2,idata) - rg(:,i1,idata)
+                    
+                    call adjust_periodic(gg)
+                    
+                    id = ceiling(norm2(gg)/ dr)
+                    if (id > gr_len) cycle
 
-            do i=1,pl_len
-                i1 = pair_list(1,i)
-                i2 = pair_list(2,i)
-                rg12(:) = this_rg(:,i2) - this_rg(:,i1)
-                
-                call adjust_periodic(rg12, cell)
-                distance = norm2(rg12)
-                idistance = ceiling(distance / dr)
-                if (idistance > nlen) cycle
+                    ! 軸1-軸2角度
+                    iangle = ceiling(calc_angle(pp1, pp2))
+                    mopp(iangle, id) = mopp(iangle, id) + 2d0
 
-                ! 軸1-軸2角度
-                call calc_angle(this_arrow(:,i1), this_arrow(:,i2), angle)
-                iangle = ceiling(angle)
-                mo1(iangle, idistance) = mo1(iangle, idistance) + 2d0
+                    ! 軸1-重心12角度
+                    iangle = ceiling(calc_angle(pp1, gg))
+                    mogp(iangle, id) = mogp(iangle, id) + 1d0
 
-                ! 軸1-重心12角度
-                call calc_angle(this_arrow(:,i1), rg12(:), angle)
-                iangle = ceiling(angle)
-                mo2(iangle, idistance) = mo2(iangle, idistance) + 1d0
-
-                ! 軸2-重心21角度
-                call calc_angle(this_arrow(:,i2), -rg12(:), angle)
-                iangle = ceiling(angle)
-                mo2(iangle, idistance) = mo2(iangle, idistance) + 1d0
+                    ! 軸2-重心21角度
+                    iangle = ceiling(calc_angle(pp2, gg))
+                    mogp(iangle, id) = mogp(iangle, id) + 1d0
+                end do
             end do
         end do
 
-        ! normalize -------------------------------------------------------
-        mo1(:,:) = mo1(:,:) / dble(ndata)
-        mo2(:,:) = mo2(:,:) / dble(ndata)
+    end subroutine
+    
 
+    subroutine normalize_molecular_orientation(mo)
+        real(real64),intent(inout):: mo(90,gr_len)
+        real(real64):: this_v, factor, nd, all_inv_v
+        integer(int32):: i
+
+        ! normalize -------------------------------------------------------
         ! 球殻に対して数密度の規格化
         factor = 4d0/3d0*pi * dr*dr*dr ! 球殻の体積を求めるときの係数部分
         nd = dble(np) / (cell**3) ! Number Density
         
-        do i=1,nlen
+        do i=1,gr_len
             this_v = factor * dble(3*i*(i-1)+1) ! i番目の球殻の体積
-            mo1(:,i) = (mo1(:,i) / this_v) / nd ! i番目の球殻の数密度 / 全体の数密度
-            mo2(:,i) = (mo2(:,i) / this_v) / nd
+            mo(:,i) = (mo(:,i) / this_v) / nd ! i番目の球殻の数密度 / 全体の数密度
         end do
         
         ! 角度に対して数密度の規格化
@@ -181,11 +167,9 @@ contains
             ! 参考: http://ralfbalt.blog66.fc2.com/blog-entry-857.html
             this_v = cos(dble(i-1)*pi/180d0) - cos(dble(i)*pi/180d0)
             all_inv_v = all_inv_v + 1d0 / this_v
-            mo1(i,:) = mo1(i,:) / this_v
-            mo2(i,:) = mo2(i,:) / this_v
+            mo(i,:) = mo(i,:) / this_v
         end do
 
-        mo1(:,:) = mo1(:,:) / all_inv_v
-        mo2(:,:) = mo2(:,:) / all_inv_v
+        mo(:,:) = mo(:,:) / all_inv_v
     end subroutine
 end program main

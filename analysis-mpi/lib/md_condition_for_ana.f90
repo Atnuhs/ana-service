@@ -480,14 +480,15 @@ contains
     end subroutine
 
 
-    subroutine load_condition_for_molecular_orientation_ana(ndata, cell)
-        integer(int32),intent(out):: ndata
+    subroutine load_condition_for_molecular_orientation_ana(ndata, np, cell)
+        integer(int32),intent(out):: ndata, np
         real(real64),intent(out):: cell
         type(md_condition_class):: md_condition
 
-        md_condition = md_condition_class()
+        md_condition = md_condition_class() 
         
         ndata = md_condition%nstep / md_condition%intr
+        np = md_condition%np
         cell = md_condition%system_cell()
     end subroutine
 
