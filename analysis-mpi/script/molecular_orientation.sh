@@ -7,8 +7,8 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 
 while read -r task fst_run lst_run
 do
-    init_dir_result "$task" 'gr'
+    init_dir_result "$task" 'molecular_orientation'
     cd "$task/Analysis"
     pwd
-    mpirun -n "${NUM_PARA}" "${DIR_ROOT}/build/src/gr.out" <<< "$fst_run $fst_run" > /dev/null
+    mpirun -n "${NUM_PARA}" "${DIR_ROOT}/build/src/molecular_orientation.out" <<< "$fst_run $fst_run" 
 done < <(gen_task_and_run_range)
