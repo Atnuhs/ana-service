@@ -10,5 +10,5 @@ do
     init_dir_result "$task" 'gr'
     cd "$task/Analysis"
     pwd
-    mpirun -n "${NUM_PARA}" "${DIR_ROOT}/build/src/gr.out" <<< "$fst_run $lst_run" > /dev/null
+    mpirun -n "${NUM_PARA}" "${DIR_ROOT}/build/src/gr.out" <<< "$fst_run $fst_run" > /dev/null
 done < <(gen_task_and_run_range)
