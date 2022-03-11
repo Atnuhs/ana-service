@@ -15,6 +15,21 @@ contains
             end do
         close(u_rxyz)
     end subroutine
+    
+
+    subroutine read_sxyz(file_sxyz, ndata, np, sxyz)
+        character(*), intent(in):: file_sxyz
+        real(real64), intent(out):: sxyz(:,:,:,:)
+        integer(int32), intent(in):: ndata, np
+        integer(int32):: i, j, k, u_sxyz
+
+        open(newunit=u_sxyz, file=file_sxyz, status='old')
+            do i=1,ndata
+                read(u_sxyz, *)
+                read(u_sxyz, *) ((sxyz(:,k,j,i), k=1,3), j=1,np)
+            end do
+        close(u_sxyz)
+    end subroutine
 
 
     subroutine read_dxyz(file_dxyz, ndata, np, dxyz)
@@ -84,6 +99,7 @@ contains
             end do
         close(u_enrg)
     end subroutine
+
 end module
 
 

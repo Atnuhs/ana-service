@@ -2,6 +2,7 @@ program main
     use,intrinsic :: iso_fortran_env
     use io_file_mod
     use md_condition_for_ana_mod
+    use const_mod
     implicit none
     include 'mpif.h'
     integer(int32):: procs, rank, ierr 
@@ -58,6 +59,7 @@ contains
 
 
     subroutine adjust_periodic(vec, cell)
+        
         real(real64),intent(in):: cell
         real(real64),intent(inout):: vec(3)
         real(real64):: hcell
@@ -94,7 +96,6 @@ contains
 
 
     subroutine normalize_gr(gr_local, ndata, np, all_run, cell, dr)
-        real(real64), parameter:: pi = acos(-1d0) 
         real(real64), intent(in):: cell, dr
         real(real64), intent(inout):: gr_local(:)
         integer(int32), intent(in)::ndata, np, all_run

@@ -17,7 +17,8 @@ macro(ADDEXE name)
 endmacro(ADDEXE)
 
 ### テストディレクトリの追加
-ADDEXE(gr io_file_mod md_condition_for_ana_mod)
+ADDEXE(gr io_file_mod md_condition_for_ana_mod const_mod)
+ADDEXE(ext_gr io_file_mod md_condition_for_ana_mod const_mod)
 ADDEXE(temp io_file_mod md_condition_for_ana_mod)
 ADDEXE(GK_thcd io_file_mod md_condition_for_ana_mod const_mod fft_mod numerical_integration_mod)
 ADDEXE(GK_viscousity io_file_mod md_condition_for_ana_mod const_mod fft_mod numerical_integration_mod)
