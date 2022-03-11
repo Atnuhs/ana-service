@@ -33,7 +33,7 @@ contains
         call mpi_bcast(lst_run, 1, mpi_integer, 0, mpi_comm_world, ierr)
         call load_condition_for_ext_gr_ana(ndata, np, cell)
         all_run = lst_run - fst_run + 1
-        dr = 0.5d0 * cell / dble(gr_len)
+        dr = 0.5d0 * cell / dble(gr_len) ! 球殻の厚み
         allocate(sxyz(3,3,np,ndata))
         allocate(gr_gp(gr_len), gr_pp(gr_len), gr_gg(gr_len), source=0d0)
 
@@ -62,9 +62,9 @@ contains
             
             allocate(x(gr_len), source=[(i*dr, i=1,gr_len)])
             
-            call write_arx_ary('./ext_gr/gr_gp', gr_len, x, gr_gp_global)
-            call write_arx_ary('./ext_gr/gr_pp', gr_len, x, gr_pp_global)
-            call write_arx_ary('./ext_gr/gr_gg', gr_len, x, gr_gg_global)
+            call write_arx_ary('./ext_gr/gr_gp.txt', gr_len, x, gr_gp_global)
+            call write_arx_ary('./ext_gr/gr_pp.txt', gr_len, x, gr_pp_global)
+            call write_arx_ary('./ext_gr/gr_gg.txt', gr_len, x, gr_gg_global)
         end if
     end subroutine
     
