@@ -28,3 +28,4 @@ ADDEXE(viscousity io_file_mod md_condition_for_ana_mod const_mod representative_
 ADDEXE(msd io_file_mod md_condition_for_ana_mod mean_square_displacement_mod)
 ADDEXE(tdc io_file_mod md_condition_for_ana_mod representative_value_mod)
 ADDEXE(rmsd io_file_mod md_condition_for_ana_mod representative_value_mod mean_square_displacement_mod)
+ADDEXE(rdc io_file_mod md_condition_for_ana_mod representative_value_mod)
