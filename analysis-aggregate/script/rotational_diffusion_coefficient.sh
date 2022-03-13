@@ -18,7 +18,7 @@ do
     while read -r task
     do
         dir_analysis="${task}/Analysis"
-        file_thcd="${dir_analysis}/rmsd/rdc.txt"
+        file_thcd="${dir_analysis}/rdc/rdc.txt"
 
         rdc=$(sed -n 1P "${file_thcd}" | awk '{print $1}')
         rdc_sd=$(sed -n 1P "${file_thcd}" | awk '{print $2}')
