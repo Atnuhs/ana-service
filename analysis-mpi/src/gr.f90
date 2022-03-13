@@ -37,7 +37,7 @@ contains
         call load_condition_for_gr_ana(ndata, np, cell)
         
         all_run = lst_run-fst_run + 1
-        dr = 2d-11
+        dr = 1d-11
         allocate(rxyz(3,np,ndata))
         gr_local(:) = 0d0 ! 各プロセスでのデータ
 

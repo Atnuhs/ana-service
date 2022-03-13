@@ -8,7 +8,7 @@ trap 'echo "ERROR: line no = $LINENO, exit status = $?" >&2; exit 1' ERR
 DIR_ROOT="$(cd "$(dirname "$0")/.."; pwd)"
 DIR_SETTING="${DIR_ROOT}/../setting"
 
-FILE_TARGET_PROJECTS="${DIR_SETTING}/target_projects.txt"
+FILE_TARGET_PROJECTS="${DIR_SETTING}/target_projects.tsv"
 
 readonly DIR_ROOT DIR_SETTING
 # .envファイルで設定されている変数に読み取りのみの属性を付加

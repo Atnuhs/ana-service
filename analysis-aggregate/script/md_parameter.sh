@@ -26,4 +26,4 @@ do
         echo -e "${task}\t${params}"
 
     done < <(gen_task_list "$project_name") > "$file_result"
-done < "${FILE_TARGET_PROJECTS}"
+done < <( tail -n +2 "${FILE_TARGET_PROJECTS}" | awk '{print $1}')

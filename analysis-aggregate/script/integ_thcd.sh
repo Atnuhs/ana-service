@@ -37,4 +37,4 @@ do
         fi
         
     done < <(gen_task_list "${project_name}")
-done < "${FILE_TARGET_PROJECTS}"
+done < <( tail -n +2 "${FILE_TARGET_PROJECTS}" | awk '{print $1}')
