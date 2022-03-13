@@ -37,6 +37,25 @@ gen_task_and_gk_vis_range () {
         awk '{print $1,$6,$7}')
 }
 
+
+gen_task_and_run_and_msd_range () {
+    while read -r line gk_vis_fst_calc gk_vis_lst_calc
+    do
+        xargs -I{} echo "{} $gk_vis_fst_calc $gk_vis_lst_calc" <"${DIR_PROJECT_PATHS}/${line}.txt"
+    done < <( tail -n +2 "${FILE_TARGET_PROJECTS}" |
+        awk '{print $1,$2,$3,$8,$9}')
+}
+
+
+gen_task_and_run_and_rmsd_range () {
+    while read -r line gk_vis_fst_calc gk_vis_lst_calc
+    do
+        xargs -I{} echo "{} $gk_vis_fst_calc $gk_vis_lst_calc" <"${DIR_PROJECT_PATHS}/${line}.txt"
+    done < <( tail -n +2 "${FILE_TARGET_PROJECTS}" |
+        awk '{print $1,$2,$3,$10,$11}')
+}
+
+
 split_file() {
     sp=$1 # 何行おきにの出力か
     awk "NR%${sp}==1"

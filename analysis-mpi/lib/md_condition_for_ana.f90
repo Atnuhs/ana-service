@@ -539,9 +539,9 @@ contains
     end subroutine
 
 
-    subroutine load_condition_for_msd_ana(ndata, np, dt, intd, temp0, cell)
+    subroutine load_condition_for_msd_ana(ndata, np, dt, intd) 
         integer(int32),intent(out):: ndata, np, intd
-        real(real64),intent(out):: dt, temp0, cell
+        real(real64),intent(out):: dt
         type(md_condition_class):: md_condition
 
         md_condition = md_condition_class()
@@ -550,14 +550,25 @@ contains
         np = md_condition%np
         dt = md_condition%dt
         intd = md_condition%intd
+    end subroutine
+
+
+    subroutine load_condition_for_tdc_ana(ndata, temp0, cell)
+        integer(int32),intent(out):: ndata
+        real(real64),intent(out):: temp0, cell
+        type(md_condition_class):: md_condition
+
+        md_condition = md_condition_class()
+
+        ndata = md_condition%nstep / md_condition%intd
         temp0 = md_condition%temp0
         cell = md_condition%system_cell()
     end subroutine
 
 
-    subroutine load_condition_for_rmsd_ana(ndata, np, dt, intd, temp0)
+    subroutine load_condition_for_rmsd_ana(ndata, np, dt, intd)
         integer(int32),intent(out):: ndata, np, intd
-        real(real64),intent(out):: dt, temp0
+        real(real64),intent(out):: dt
         type(md_condition_class):: md_condition
 
         md_condition = md_condition_class()
@@ -566,8 +577,20 @@ contains
         np = md_condition%np
         dt = md_condition%dt
         intd = md_condition%intd
+    end subroutine
+
+
+    subroutine load_condition_for_rdc_ana(ndata, temp0)
+        integer(int32),intent(out):: ndata
+        real(real64),intent(out):: temp0
+        type(md_condition_class):: md_condition
+
+        md_condition = md_condition_class()
+
+        ndata = md_condition%nstep / md_condition%intd
         temp0 = md_condition%temp0
     end subroutine
+
 
     subroutine load_condition_for_transpose_rxyz(ndata, np)
         integer(int32),intent(out):: ndata, np
