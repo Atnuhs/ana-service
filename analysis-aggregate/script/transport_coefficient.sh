@@ -26,4 +26,4 @@ do
     join -t $'\t' "$file_md_param" "${file_result}.tmp3" > "$file_result"
     rm "${file_result}.tmp1" "${file_result}.tmp2" "${file_result}.tmp3"
 
-done < "${FILE_TARGET_PROJECTS}"
+done < <( tail -n +2 "${FILE_TARGET_PROJECTS}" | awk '{print $1}')
