@@ -34,7 +34,6 @@ contains
         call mpi_bcast(fst_run, 1, mpi_integer, 0, mpi_comm_world, ierr)
         call mpi_bcast(lst_run, 1, mpi_integer, 0, mpi_comm_world, ierr)
         call load_condition_for_ext_gr_ana(ndata, np, cell)
-        ndata = ndata / 50
         all_run = lst_run - fst_run + 1
         dr = 1d-12 ! 球殻の厚み / m
         dr_3d = 1d-11 ! 球殻の厚み(gr_3d) / m
