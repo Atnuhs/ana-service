@@ -93,6 +93,6 @@ contains
         r = lst_calc
         n = r-l+1
         call least_squares_method(len_arr=n, arx=x(l:r), ary=rmsd(l:r), a=a)
-        rdc = a / 4d0 * (temp/temp0)
+        rdc = a / 4d0 * (temp0/temp)
     end function
 end program
