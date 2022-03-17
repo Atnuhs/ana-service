@@ -11,7 +11,7 @@ program main
     real(real64):: convergence, convergence_stdev
 
     read*, fst_calc, lst_calc
-    call load_condition_for_thcd_ana(ndata)
+    call load_condition_for_viscousity_ana(ndata)
     allocate(x(ndata), integ(ndata), integ_stdev(ndata))
     call read_arx_ary_arysd(file_integ, ndata, x, integ, integ_stdev)
     convergence = mean(integ(fst_calc:lst_calc), stdev=convergence_stdev)
