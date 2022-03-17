@@ -13,7 +13,7 @@ program main
 
     read*, fst_calc, lst_calc
     call load_condition_for_thcd_ana(ndata, temp)
-    call read_x('./temp/temp_mean.dat', temp)
+    call read_x('./temp/temp_mean.txt', temp)
     allocate(x(ndata), integ(ndata), integ_stdev(ndata))
     call read_arx_ary_arysd(file_integ, ndata, x, integ, integ_stdev)
     convergence = mean(integ(fst_calc:lst_calc), stdev=convergence_stdev)
