@@ -9,6 +9,6 @@ while read -r task fst_run lst_run
 do  
     init_dir_result "$task" 'temp'
     cd "$task/Analysis"
-    pwd
+    echo "${BASH_SOURCE[0]}: $(pwd): $fst_run $lst_run"
     mpirun -n "${NUM_PARA}" "${DIR_ROOT}/build/src/temp.out" <<< "$fst_run $lst_run" > /dev/null
 done < <(gen_task_and_run_range)
