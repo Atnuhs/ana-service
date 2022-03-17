@@ -506,13 +506,15 @@ contains
     end subroutine
 
 
-    subroutine load_condition_for_thcd_ana(ndata)
+    subroutine load_condition_for_thcd_ana(ndata, temp0)
         integer(int32),intent(out):: ndata
+        real(real64),intent(out):: temp0
         type(md_condition_class):: md_condition
 
         md_condition = md_condition_class()
 
         ndata = md_condition%nstep
+        temp0 = md_condition%temp0
     end subroutine
 
 
